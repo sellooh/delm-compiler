@@ -79,15 +79,15 @@ type alias Signature =
 type Msg
     = GenerateGlobal Msg Time.Posix
     | SetGlobal Msg Global
+    | GenerateNewAddress
+    | GetAddressSeed Int
+    | SetDeployer Address
+    | SetValue Int
     | DeployIntent Msg
     | Deploy FunctionIO
     | ContractCallIntent Msg
     | ContractCall String FunctionIO
     | SetForm String Position Basic
-    | GenerateNewAddress
-    | GetAddressSeed Int
-    | SetDeployer Address
-    | SetValue Int
 
 
 initialize : Contract msg model -> Program () (Model msg model) Msg
