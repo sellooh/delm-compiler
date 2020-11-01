@@ -55,12 +55,11 @@ type alias Contract msg model =
     , update : msg -> Global -> model -> ( Requirements, model, FunctionIO )
     , signatures : List ( String, Signature )
     , encodeMsg : ( String, FunctionIO ) -> msg
-    , deploys : Mapping String model
     }
 
 
-type alias Model msg model =
-    { contract : Contract msg model
+type alias Model model =
+    { deploys : Mapping String model
     , form : Mapping String ( Maybe Basic, Maybe Basic, Maybe Basic )
     , returns : Mapping String FunctionIO
     , addresses : Dict Address Float
@@ -90,20 +89,20 @@ type Msg
     | SetForm String Position Basic
 
 
-initialize : Contract msg model -> Program () (Model msg model) Msg
+initialize : Contract msg model -> Program () (Model model) Msg
 initialize contract =
     Browser.element
         { init = init contract
         , view = view contract
-        , update = update
+        , update = update contract
         , subscriptions = subscriptions
         }
 
 
-init : Contract msg model -> () -> ( Model msg model, Cmd Msg )
+init : Contract msg model -> () -> ( Model model, Cmd Msg )
 init contract _ =
-    ( { contract = contract
-      , form = Mapping.empty
+    ( { form = Mapping.empty
+      , deploys = Mapping.empty
       , returns = Mapping.empty
       , addresses =
             Dict.empty
@@ -126,7 +125,7 @@ init contract _ =
     )
 
 
-generateGlobal : Model msg model -> Time.Posix -> Random.Generator Global
+generateGlobal : Model model -> Time.Posix -> Random.Generator Global
 generateGlobal model timestamp =
     let
         msg =
@@ -152,8 +151,8 @@ generateGlobal model timestamp =
         (Random.int 0 Random.maxInt)
 
 
-update : Msg -> Model msg model -> ( Model msg model, Cmd Msg )
-update msg model =
+update : Contract msg model -> Msg -> Model model -> ( Model model, Cmd Msg )
+update contract msg model =
     case msg of
         GenerateGlobal msgIntent timestamp ->
             ( model
@@ -207,14 +206,11 @@ update msg model =
 
         Deploy params ->
             let
-                contract =
-                    model.contract
-
                 ( constructor, _ ) =
                     contract.constructor
 
-                updatedContract =
-                    { contract | deploys = Mapping.insert "default" (constructor model.global params) contract.deploys }
+                deploys =
+                    Mapping.insert "default" (constructor model.global params) model.deploys
 
                 deployerAddress =
                     Maybe.withDefault "" model.sender
@@ -232,7 +228,7 @@ update msg model =
                 addresses =
                     Dict.insert deployerAddress (deployerEth - 0.1) model.addresses
             in
-            ( { model | contract = updatedContract, addresses = addresses }, Cmd.none )
+            ( { model | deploys = deploys, addresses = addresses }, Cmd.none )
 
         ContractCallIntent msgIntent ->
             ( model
@@ -243,11 +239,8 @@ update msg model =
 
         ContractCall name params ->
             let
-                contract =
-                    model.contract
-
                 deploy =
-                    case Mapping.get "default" contract.deploys of
+                    case Mapping.get "default" model.deploys of
                         Just m ->
                             m
 
@@ -275,12 +268,12 @@ update msg model =
                     else
                         Just (Debug.log "failed" (String.join " " errors))
 
-                updatedContract =
+                deploys =
                     if List.length errors == 0 then
-                        { contract | deploys = Mapping.insert "default" updatedModel contract.deploys }
+                        Mapping.insert "default" updatedModel model.deploys
 
                     else
-                        contract
+                        model.deploys
 
                 newReturns =
                     if List.length errors == 0 then
@@ -291,7 +284,7 @@ update msg model =
                     else
                         model.returns
             in
-            ( { model | contract = updatedContract, returns = newReturns }, Cmd.none )
+            ( { model | deploys = deploys, returns = newReturns }, Cmd.none )
 
         SetForm name position param ->
             -- throw "not implemented yet."
@@ -316,11 +309,11 @@ update msg model =
             ( { model | form = updatedForm }, Cmd.none )
 
 
-view : Contract msg model -> Model msg model -> Html Msg
+view : Contract msg model -> Model model -> Html Msg
 view contract model =
     let
         signatures =
-            model.contract.signatures
+            contract.signatures
 
         ( _, constructorSignature ) =
             contract.constructor
@@ -341,7 +334,7 @@ view contract model =
         ]
 
 
-viewAddresses : Model msg model -> List (Html Msg)
+viewAddresses : Model model -> List (Html Msg)
 viewAddresses model =
     let
         sender =
@@ -371,7 +364,7 @@ viewAddresses model =
         (Dict.toList model.addresses)
 
 
-constructorForm : Model msg model -> ( String, Signature ) -> Html Msg
+constructorForm : Model model -> ( String, Signature ) -> Html Msg
 constructorForm model nameSignature =
     let
         fields =
@@ -395,7 +388,7 @@ constructorForm model nameSignature =
         ]
 
 
-form : Model msg model -> ( String, Signature ) -> Html Msg
+form : Model model -> ( String, Signature ) -> Html Msg
 form model nameSignature =
     let
         ( name, _ ) =
@@ -404,7 +397,7 @@ form model nameSignature =
         fields =
             signatureToInput model nameSignature
     in
-    case Mapping.get "default" model.contract.deploys of
+    case Mapping.get "default" model.deploys of
         Just _ ->
             div []
                 [ text name
@@ -415,7 +408,7 @@ form model nameSignature =
             text ""
 
 
-signatureToInput : Model msg model -> ( String, Signature ) -> Html Msg
+signatureToInput : Model model -> ( String, Signature ) -> Html Msg
 signatureToInput model nameSignature =
     let
         ( key, signature ) =
@@ -445,7 +438,7 @@ signatureToInput model nameSignature =
             text ""
 
 
-singleToInput : Model msg model -> String -> Position -> Interface -> Html Msg
+singleToInput : Model model -> String -> Position -> Interface -> Html Msg
 singleToInput model key position interface =
     let
         ( v1, v2, v3 ) =
@@ -509,7 +502,7 @@ singleToInput model key position interface =
             input [ type_ "number", placeholder "Int", value val, onInput (\s -> SetForm key position (RInt (Maybe.withDefault 0 (toInt s)))) ] []
 
 
-formParseSend : Model msg model -> String -> List (Html Msg)
+formParseSend : Model model -> String -> List (Html Msg)
 formParseSend model key =
     let
         formData =
@@ -586,7 +579,7 @@ formParseSend model key =
     ]
 
 
-subscriptions : Model msg model -> Sub Msg
+subscriptions : Model model -> Sub Msg
 subscriptions model =
     Sub.none
 

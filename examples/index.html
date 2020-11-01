@@ -5256,9 +5256,9 @@ var $elm$core$Set$toList = function (_v0) {
 	return $elm$core$Dict$keys(dict);
 };
 var $elm$core$Basics$GT = {$: 'GT'};
-var $author$project$Voting$Concept$Contract$Contract = F5(
-	function (constructor, update, signatures, encodeMsg, deploys) {
-		return {constructor: constructor, deploys: deploys, encodeMsg: encodeMsg, signatures: signatures, update: update};
+var $author$project$Voting$Concept$Contract$Contract = F4(
+	function (constructor, update, signatures, encodeMsg) {
+		return {constructor: constructor, encodeMsg: encodeMsg, signatures: signatures, update: update};
 	});
 var $author$project$Voting$Concept$Contract$INone = {$: 'INone'};
 var $author$project$Voting$Concept$Contract$IString = {$: 'IString'};
@@ -5429,11 +5429,6 @@ var $author$project$Voting$Voting$constructor = F2(
 				A4($author$project$Voting$Voting$Voter, 1, false, $elm$core$Maybe$Nothing, $elm$core$Maybe$Nothing))
 		};
 	});
-var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
-var $author$project$Voting$Concept$Mapping$empty = function () {
-	var dict = $elm$core$Dict$empty;
-	return $author$project$Voting$Concept$Mapping$Mapping(dict);
-}();
 var $author$project$Voting$Voting$DelegateVote = function (a) {
 	return {$: 'DelegateVote', a: a};
 };
@@ -6574,6 +6569,7 @@ var $elm$browser$Debugger$Main$cornerView = function (model) {
 		$elm$browser$Debugger$History$size(model.history),
 		model.overlay);
 };
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$core$Set$foldr = F3(
 	function (func, initialState, _v0) {
 		var dict = _v0.a;
@@ -10958,6 +10954,10 @@ var $elm$random$Random$int = F2(
 var $elm$random$Random$maxInt = 2147483647;
 var $elm$random$Random$minInt = -2147483648;
 var $author$project$Voting$Concept$Contract$anyInt = A2($elm$random$Random$int, $elm$random$Random$minInt, $elm$random$Random$maxInt);
+var $author$project$Voting$Concept$Mapping$empty = function () {
+	var dict = $elm$core$Dict$empty;
+	return $author$project$Voting$Concept$Mapping$Mapping(dict);
+}();
 var $elm$random$Random$Generate = function (a) {
 	return {$: 'Generate', a: a};
 };
@@ -11078,7 +11078,7 @@ var $author$project$Voting$Concept$Contract$init = F2(
 		return _Utils_Tuple2(
 			{
 				addresses: $elm$core$Dict$empty,
-				contract: contract,
+				deploys: $author$project$Voting$Concept$Mapping$empty,
 				form: $author$project$Voting$Concept$Mapping$empty,
 				global: {
 					block: {coinbase: '', difficulty: 0, gasLimit: 0, number: 0, timestamp: 0},
@@ -12289,8 +12289,8 @@ var $author$project$Voting$Concept$Mapping$insert = F3(
 		return $author$project$Voting$Concept$Mapping$Mapping(internalDict);
 	});
 var $elm$core$Debug$log = _Debug_log;
-var $author$project$Voting$Concept$Contract$update = F2(
-	function (msg, model) {
+var $author$project$Voting$Concept$Contract$update = F3(
+	function (contract, msg, model) {
 		switch (msg.$) {
 			case 'GenerateGlobal':
 				var msgIntent = msg.a;
@@ -12389,24 +12389,19 @@ var $author$project$Voting$Concept$Contract$update = F2(
 					$elm$core$Maybe$withDefault,
 					0,
 					A2($elm$core$Dict$get, deployerAddress, model.addresses));
-				var contract = model.contract;
 				var addresses = A3($elm$core$Dict$insert, deployerAddress, deployerEth - 0.1, model.addresses);
 				var _v2 = contract.constructor;
 				var constructor = _v2.a;
-				var updatedContract = _Utils_update(
-					contract,
-					{
-						deploys: A3(
-							$author$project$Voting$Concept$Mapping$insert,
-							'default',
-							A2(constructor, model.global, params),
-							contract.deploys)
-					});
+				var deploys = A3(
+					$author$project$Voting$Concept$Mapping$insert,
+					'default',
+					A2(constructor, model.global, params),
+					model.deploys);
 				var _v3 = ((deployerEth - 0.1) < 0) ? $author$project$Voting$Concept$Core$throw('Not enough funds') : 0;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{addresses: addresses, contract: updatedContract}),
+						{addresses: addresses, deploys: deploys}),
 					$elm$core$Platform$Cmd$none);
 			case 'ContractCallIntent':
 				var msgIntent = msg.a;
@@ -12423,9 +12418,8 @@ var $author$project$Voting$Concept$Contract$update = F2(
 			case 'ContractCall':
 				var name = msg.a;
 				var params = msg.b;
-				var contract = model.contract;
 				var deploy = function () {
-					var _v7 = A2($author$project$Voting$Concept$Mapping$get, 'default', contract.deploys);
+					var _v7 = A2($author$project$Voting$Concept$Mapping$get, 'default', model.deploys);
 					if (_v7.$ === 'Just') {
 						var m = _v7.a;
 						return m;
@@ -12451,11 +12445,7 @@ var $author$project$Voting$Concept$Contract$update = F2(
 					},
 					requirements);
 				var newReturns = (!$elm$core$List$length(errors)) ? A3($author$project$Voting$Concept$Mapping$insert, name, returns, model.returns) : model.returns;
-				var updatedContract = (!$elm$core$List$length(errors)) ? _Utils_update(
-					contract,
-					{
-						deploys: A3($author$project$Voting$Concept$Mapping$insert, 'default', updatedModel, contract.deploys)
-					}) : contract;
+				var deploys = (!$elm$core$List$length(errors)) ? A3($author$project$Voting$Concept$Mapping$insert, 'default', updatedModel, model.deploys) : model.deploys;
 				var _v5 = (!$elm$core$List$length(errors)) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
 					A2(
 						$elm$core$Debug$log,
@@ -12464,7 +12454,7 @@ var $author$project$Voting$Concept$Contract$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{contract: updatedContract, returns: newReturns}),
+						{deploys: deploys, returns: newReturns}),
 					$elm$core$Platform$Cmd$none);
 			default:
 				var name = msg.a;
@@ -12846,7 +12836,7 @@ var $author$project$Voting$Concept$Contract$form = F2(
 		var fields = A2($author$project$Voting$Concept$Contract$signatureToInput, model, nameSignature);
 		var _v0 = nameSignature;
 		var name = _v0.a;
-		var _v1 = A2($author$project$Voting$Concept$Mapping$get, 'default', model.contract.deploys);
+		var _v1 = A2($author$project$Voting$Concept$Mapping$get, 'default', model.deploys);
 		if (_v1.$ === 'Just') {
 			return A2(
 				$elm$html$Html$div,
@@ -12916,7 +12906,7 @@ var $author$project$Voting$Concept$Contract$viewAddresses = function (model) {
 };
 var $author$project$Voting$Concept$Contract$view = F2(
 	function (contract, model) {
-		var signatures = model.contract.signatures;
+		var signatures = contract.signatures;
 		var _v0 = contract.constructor;
 		var constructorSignature = _v0.b;
 		return A2(
@@ -12984,7 +12974,7 @@ var $author$project$Voting$Concept$Contract$initialize = function (contract) {
 		{
 			init: $author$project$Voting$Concept$Contract$init(contract),
 			subscriptions: $author$project$Voting$Concept$Contract$subscriptions,
-			update: $author$project$Voting$Concept$Contract$update,
+			update: $author$project$Voting$Concept$Contract$update(contract),
 			view: $author$project$Voting$Concept$Contract$view(contract)
 		});
 };
@@ -13248,7 +13238,7 @@ var $author$project$Voting$Voting$update = F3(
 		}
 	});
 var $author$project$Voting$Voting$main = $author$project$Voting$Concept$Contract$initialize(
-	A5(
+	A4(
 		$author$project$Voting$Concept$Contract$Contract,
 		_Utils_Tuple2(
 			$author$project$Voting$Voting$constructor,
@@ -13259,10 +13249,9 @@ var $author$project$Voting$Voting$main = $author$project$Voting$Concept$Contract
 				$author$project$Voting$Concept$Contract$INone)),
 		$author$project$Voting$Voting$update,
 		$author$project$Voting$Voting$signatures,
-		$author$project$Voting$Voting$encodeMsg,
-		$author$project$Voting$Concept$Mapping$empty));
+		$author$project$Voting$Voting$encodeMsg));
 _Platform_export({'Voting':{'Voting':{'init':$author$project$Voting$Voting$main(
-	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Voting.Concept.Contract.Msg","aliases":{"Voting.Concept.Core.Address":{"args":[],"type":"String.String"},"Voting.Concept.Core.Block":{"args":[],"type":"{ coinbase : Voting.Concept.Core.Address, difficulty : Basics.Int, gasLimit : Basics.Int, number : Basics.Int, timestamp : Basics.Int }"},"Voting.Concept.Core.Global":{"args":[],"type":"{ msg : Voting.Concept.Core.Msg, block : Voting.Concept.Core.Block }"},"Voting.Concept.Core.Msg":{"args":[],"type":"{ sender : Voting.Concept.Core.PayableAddress, data : String.String, sig : String.String, value : Basics.Int }"},"Voting.Concept.Core.PayableAddress":{"args":[],"type":"String.String"}},"unions":{"Voting.Concept.Contract.Msg":{"args":[],"tags":{"GenerateGlobal":["Voting.Concept.Contract.Msg","Time.Posix"],"SetGlobal":["Voting.Concept.Contract.Msg","Voting.Concept.Core.Global"],"DeployIntent":["Voting.Concept.Contract.Msg"],"Deploy":["Voting.Concept.Contract.FunctionIO"],"ContractCallIntent":["Voting.Concept.Contract.Msg"],"ContractCall":["String.String","Voting.Concept.Contract.FunctionIO"],"SetForm":["String.String","Voting.Concept.Contract.Position","Voting.Concept.Contract.Basic"],"GenerateNewAddress":[],"GetAddressSeed":["Basics.Int"],"SetDeployer":["Voting.Concept.Core.Address"],"SetValue":["Basics.Int"]}},"Voting.Concept.Contract.Basic":{"args":[],"tags":{"RAddress":["Voting.Concept.Core.Address"],"RString":["String.String"],"RInt":["Basics.Int"]}},"Voting.Concept.Contract.FunctionIO":{"args":[],"tags":{"None":[],"Single":["Voting.Concept.Contract.Basic"],"Tuple2":["( Voting.Concept.Contract.Basic, Voting.Concept.Contract.Basic )"],"Tuple3":["( Voting.Concept.Contract.Basic, Voting.Concept.Contract.Basic, Voting.Concept.Contract.Basic )"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Voting.Concept.Contract.Position":{"args":[],"tags":{"P1":[],"P2":[],"P3":[]}},"Time.Posix":{"args":[],"tags":{"Posix":["Basics.Int"]}},"String.String":{"args":[],"tags":{"String":[]}}}}})}}});}(this));
+	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Voting.Concept.Contract.Msg","aliases":{"Voting.Concept.Core.Address":{"args":[],"type":"String.String"},"Voting.Concept.Core.Block":{"args":[],"type":"{ coinbase : Voting.Concept.Core.Address, difficulty : Basics.Int, gasLimit : Basics.Int, number : Basics.Int, timestamp : Basics.Int }"},"Voting.Concept.Core.Global":{"args":[],"type":"{ msg : Voting.Concept.Core.Msg, block : Voting.Concept.Core.Block }"},"Voting.Concept.Core.Msg":{"args":[],"type":"{ sender : Voting.Concept.Core.PayableAddress, data : String.String, sig : String.String, value : Basics.Int }"},"Voting.Concept.Core.PayableAddress":{"args":[],"type":"String.String"}},"unions":{"Voting.Concept.Contract.Msg":{"args":[],"tags":{"GenerateGlobal":["Voting.Concept.Contract.Msg","Time.Posix"],"SetGlobal":["Voting.Concept.Contract.Msg","Voting.Concept.Core.Global"],"GenerateNewAddress":[],"GetAddressSeed":["Basics.Int"],"SetDeployer":["Voting.Concept.Core.Address"],"SetValue":["Basics.Int"],"DeployIntent":["Voting.Concept.Contract.Msg"],"Deploy":["Voting.Concept.Contract.FunctionIO"],"ContractCallIntent":["Voting.Concept.Contract.Msg"],"ContractCall":["String.String","Voting.Concept.Contract.FunctionIO"],"SetForm":["String.String","Voting.Concept.Contract.Position","Voting.Concept.Contract.Basic"]}},"Voting.Concept.Contract.Basic":{"args":[],"tags":{"RAddress":["Voting.Concept.Core.Address"],"RString":["String.String"],"RInt":["Basics.Int"]}},"Voting.Concept.Contract.FunctionIO":{"args":[],"tags":{"None":[],"Single":["Voting.Concept.Contract.Basic"],"Tuple2":["( Voting.Concept.Contract.Basic, Voting.Concept.Contract.Basic )"],"Tuple3":["( Voting.Concept.Contract.Basic, Voting.Concept.Contract.Basic, Voting.Concept.Contract.Basic )"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Voting.Concept.Contract.Position":{"args":[],"tags":{"P1":[],"P2":[],"P3":[]}},"Time.Posix":{"args":[],"tags":{"Posix":["Basics.Int"]}},"String.String":{"args":[],"tags":{"String":[]}}}}})}}});}(this));
 
   var app = Elm.Voting.Voting.init({ node: document.getElementById("elm") });
 }

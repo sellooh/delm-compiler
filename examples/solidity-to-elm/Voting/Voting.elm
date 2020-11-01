@@ -6,15 +6,13 @@ import Voting.Concept.Core exposing (Address, Global, Requirements, defaultValue
 import Voting.Concept.Mapping as Mapping exposing (Mapping(..))
 
 
-main : Program () (ContractModule.Model Msg Model) ContractModule.Msg
+main : Program () (ContractModule.Model Model) ContractModule.Msg
 main =
     initialize
         (Contract ( constructor, Signature (ITuple2 ( IString, IString )) INone )
             update
             signatures
             encodeMsg
-            Mapping.empty
-         -- think about this
         )
 
 
