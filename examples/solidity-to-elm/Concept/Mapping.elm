@@ -1,4 +1,4 @@
-module Voting.Concept.Mapping exposing (..)
+module Concept.Mapping exposing (..)
 
 import Dict exposing (Dict)
 

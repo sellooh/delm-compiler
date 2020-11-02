@@ -1,4 +1,4 @@
-port module Voting.Concept.Core exposing (..)
+port module Concept.Core exposing (..)
 
 
 port sendMessage : String -> Cmd msg

@@ -1,4 +1,4 @@
-port module Voting.Concept.Contract exposing (..)
+port module Concept.Contract exposing (..)
 
 import Array exposing (Array)
 import Browser
@@ -14,8 +14,8 @@ import Random
 import String exposing (fromFloat, fromInt, toInt)
 import Task
 import Time
-import Voting.Concept.Core exposing (Address, Global, Requirements, throw)
-import Voting.Concept.Mapping as Mapping exposing (Mapping(..), empty)
+import Concept.Core exposing (Address, Global, Requirements, throw)
+import Concept.Mapping as Mapping exposing (Mapping(..), empty)
 
 
 type Basic
