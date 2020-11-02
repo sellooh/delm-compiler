@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Voting.Voting</title>
+  <title>ERC20.ERC20</title>
   <style>body { padding: 0; margin: 0; }</style>
 </head>
 
@@ -5260,117 +5260,15 @@ var $author$project$Concept$Contract$Contract = F4(
 	function (constructor, update, signatures, encodeMsg) {
 		return {constructor: constructor, encodeMsg: encodeMsg, signatures: signatures, update: update};
 	});
+var $author$project$Concept$Contract$IInt = {$: 'IInt'};
 var $author$project$Concept$Contract$INone = {$: 'INone'};
 var $author$project$Concept$Contract$IString = {$: 'IString'};
-var $author$project$Concept$Contract$ITuple2 = function (a) {
-	return {$: 'ITuple2', a: a};
+var $author$project$Concept$Contract$ITuple3 = function (a) {
+	return {$: 'ITuple3', a: a};
 };
 var $author$project$Concept$Contract$Signature = F2(
 	function (inputs, outputs) {
 		return {inputs: inputs, outputs: outputs};
-	});
-var $elm$core$Basics$False = {$: 'False'};
-var $elm$core$Maybe$Nothing = {$: 'Nothing'};
-var $author$project$Voting$Voting$Proposal = F2(
-	function (name, voteCount) {
-		return {name: name, voteCount: voteCount};
-	});
-var $author$project$Voting$Voting$Voter = F4(
-	function (weight, voted, delegate, vote) {
-		return {delegate: delegate, vote: vote, voted: voted, weight: weight};
-	});
-var $elm$core$Basics$add = _Basics_add;
-var $elm$core$List$foldl = F3(
-	function (func, acc, list) {
-		foldl:
-		while (true) {
-			if (!list.b) {
-				return acc;
-			} else {
-				var x = list.a;
-				var xs = list.b;
-				var $temp$func = func,
-					$temp$acc = A2(func, x, acc),
-					$temp$list = xs;
-				func = $temp$func;
-				acc = $temp$acc;
-				list = $temp$list;
-				continue foldl;
-			}
-		}
-	});
-var $elm$core$Basics$gt = _Utils_gt;
-var $elm$core$List$reverse = function (list) {
-	return A3($elm$core$List$foldl, $elm$core$List$cons, _List_Nil, list);
-};
-var $elm$core$List$foldrHelper = F4(
-	function (fn, acc, ctr, ls) {
-		if (!ls.b) {
-			return acc;
-		} else {
-			var a = ls.a;
-			var r1 = ls.b;
-			if (!r1.b) {
-				return A2(fn, a, acc);
-			} else {
-				var b = r1.a;
-				var r2 = r1.b;
-				if (!r2.b) {
-					return A2(
-						fn,
-						a,
-						A2(fn, b, acc));
-				} else {
-					var c = r2.a;
-					var r3 = r2.b;
-					if (!r3.b) {
-						return A2(
-							fn,
-							a,
-							A2(
-								fn,
-								b,
-								A2(fn, c, acc)));
-					} else {
-						var d = r3.a;
-						var r4 = r3.b;
-						var res = (ctr > 500) ? A3(
-							$elm$core$List$foldl,
-							fn,
-							acc,
-							$elm$core$List$reverse(r4)) : A4($elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
-						return A2(
-							fn,
-							a,
-							A2(
-								fn,
-								b,
-								A2(
-									fn,
-									c,
-									A2(fn, d, res))));
-					}
-				}
-			}
-		}
-	});
-var $elm$core$List$foldr = F3(
-	function (fn, acc, ls) {
-		return A4($elm$core$List$foldrHelper, fn, acc, 0, ls);
-	});
-var $elm$core$List$map = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, acc) {
-					return A2(
-						$elm$core$List$cons,
-						f(x),
-						acc);
-				}),
-			_List_Nil,
-			xs);
 	});
 var $elm$core$Basics$identity = function (x) {
 	return x;
@@ -5378,19 +5276,128 @@ var $elm$core$Basics$identity = function (x) {
 var $author$project$Concept$Mapping$Mapping = function (a) {
 	return {$: 'Mapping', a: a};
 };
-var $elm$core$Dict$Black = {$: 'Black'};
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
+var $author$project$Concept$Mapping$empty = function () {
+	var dict = $elm$core$Dict$empty;
+	return $author$project$Concept$Mapping$Mapping(dict);
+}();
+var $elm$core$Dict$Black = {$: 'Black'};
 var $elm$core$Dict$RBNode_elm_builtin = F5(
 	function (a, b, c, d, e) {
 		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
 	});
-var $elm$core$Dict$singleton = F2(
-	function (key, value) {
-		return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
+var $elm$core$Dict$Red = {$: 'Red'};
+var $elm$core$Dict$balance = F5(
+	function (color, key, value, left, right) {
+		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
+			var _v1 = right.a;
+			var rK = right.b;
+			var rV = right.c;
+			var rLeft = right.d;
+			var rRight = right.e;
+			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
+				var _v3 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var lLeft = left.d;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					key,
+					value,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					color,
+					rK,
+					rV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, left, rLeft),
+					rRight);
+			}
+		} else {
+			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
+				var _v5 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var _v6 = left.d;
+				var _v7 = _v6.a;
+				var llK = _v6.b;
+				var llV = _v6.c;
+				var llLeft = _v6.d;
+				var llRight = _v6.e;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					lK,
+					lV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, key, value, lRight, right));
+			} else {
+				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
+			}
+		}
 	});
-var $author$project$Concept$Mapping$singleton = F2(
-	function (comparable, value) {
-		var internalDict = A2($elm$core$Dict$singleton, comparable, value);
+var $elm$core$Basics$compare = _Utils_compare;
+var $elm$core$Dict$insertHelp = F3(
+	function (key, value, dict) {
+		if (dict.$ === 'RBEmpty_elm_builtin') {
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
+		} else {
+			var nColor = dict.a;
+			var nKey = dict.b;
+			var nValue = dict.c;
+			var nLeft = dict.d;
+			var nRight = dict.e;
+			var _v1 = A2($elm$core$Basics$compare, key, nKey);
+			switch (_v1.$) {
+				case 'LT':
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						A3($elm$core$Dict$insertHelp, key, value, nLeft),
+						nRight);
+				case 'EQ':
+					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
+				default:
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						nLeft,
+						A3($elm$core$Dict$insertHelp, key, value, nRight));
+			}
+		}
+	});
+var $elm$core$Dict$insert = F3(
+	function (key, value, dict) {
+		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
+		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
+var $author$project$Concept$Mapping$insert = F3(
+	function (comparable, value, mapping) {
+		var dict = function () {
+			var d = mapping.a;
+			return d;
+		}();
+		var internalDict = A3($elm$core$Dict$insert, comparable, value, dict);
 		return $author$project$Concept$Mapping$Mapping(internalDict);
 	});
 var $elm$core$Debug$todo = _Debug_todo;
@@ -5400,86 +5407,125 @@ var $author$project$Concept$Core$throw = _Debug_todo(
 		start: {line: 26, column: 5},
 		end: {line: 26, column: 15}
 	});
-var $author$project$Voting$Voting$constructor = F2(
-	function (global, proposals) {
+var $author$project$ERC20$ERC20$constructor = F2(
+	function (global, params) {
 		var _v0 = function () {
-			if (((proposals.$ === 'Tuple2') && (proposals.a.a.$ === 'RString')) && (proposals.a.b.$ === 'RString')) {
-				var _v2 = proposals.a;
-				var s1 = _v2.a.a;
-				var s2 = _v2.b.a;
-				return _Utils_Tuple2(s1, s2);
+			if ((((params.$ === 'Tuple3') && (params.a.a.$ === 'RString')) && (params.a.b.$ === 'RString')) && (params.a.c.$ === 'RInt')) {
+				var _v2 = params.a;
+				var n = _v2.a.a;
+				var s = _v2.b.a;
+				var ts = _v2.c.a;
+				return _Utils_Tuple3(n, s, ts);
 			} else {
 				return $author$project$Concept$Core$throw('Invalid parameters');
 			}
 		}();
-		var p1 = _v0.a;
-		var p2 = _v0.b;
+		var name = _v0.a;
+		var symbol = _v0.b;
+		var totalSupply = _v0.c;
 		return {
-			chairperson: global.msg.sender,
-			proposals: A2(
-				$elm$core$List$map,
-				function (proposal) {
-					return A2($author$project$Voting$Voting$Proposal, proposal, 0);
-				},
-				_List_fromArray(
-					[p1, p2])),
-			voters: A2(
-				$author$project$Concept$Mapping$singleton,
-				global.msg.sender,
-				A4($author$project$Voting$Voting$Voter, 1, false, $elm$core$Maybe$Nothing, $elm$core$Maybe$Nothing))
+			allowances: $author$project$Concept$Mapping$empty,
+			balances: A3($author$project$Concept$Mapping$insert, global.msg.sender, totalSupply, $author$project$Concept$Mapping$empty),
+			decimals: 2,
+			name: name,
+			symbol: symbol,
+			totalSupply: totalSupply
 		};
 	});
-var $author$project$Voting$Voting$DelegateVote = function (a) {
-	return {$: 'DelegateVote', a: a};
+var $author$project$ERC20$ERC20$Approve = F2(
+	function (a, b) {
+		return {$: 'Approve', a: a, b: b};
+	});
+var $author$project$ERC20$ERC20$BalanceOf = function (a) {
+	return {$: 'BalanceOf', a: a};
 };
-var $author$project$Voting$Voting$GetWinningProposal = {$: 'GetWinningProposal'};
-var $author$project$Voting$Voting$GetWinningProposalName = {$: 'GetWinningProposalName'};
-var $author$project$Voting$Voting$GiveRightToVote = function (a) {
-	return {$: 'GiveRightToVote', a: a};
-};
-var $author$project$Voting$Voting$SendVote = function (a) {
-	return {$: 'SendVote', a: a};
-};
-var $author$project$Voting$Voting$encodeMsg = function (toEncode) {
-	_v0$5:
+var $author$project$ERC20$ERC20$GetAllowance = F2(
+	function (a, b) {
+		return {$: 'GetAllowance', a: a, b: b};
+	});
+var $author$project$ERC20$ERC20$GetDecimals = {$: 'GetDecimals'};
+var $author$project$ERC20$ERC20$GetName = {$: 'GetName'};
+var $author$project$ERC20$ERC20$GetSymbol = {$: 'GetSymbol'};
+var $author$project$ERC20$ERC20$GetTotalSupply = {$: 'GetTotalSupply'};
+var $author$project$ERC20$ERC20$Transfer = F2(
+	function (a, b) {
+		return {$: 'Transfer', a: a, b: b};
+	});
+var $author$project$ERC20$ERC20$TransferFrom = F3(
+	function (a, b, c) {
+		return {$: 'TransferFrom', a: a, b: b, c: c};
+	});
+var $author$project$ERC20$ERC20$encodeMsg = function (toEncode) {
+	_v0$9:
 	while (true) {
 		switch (toEncode.b.$) {
 			case 'Single':
-				switch (toEncode.b.a.$) {
-					case 'RAddress':
-						switch (toEncode.a) {
-							case 'giveRightToVote':
-								var address = toEncode.b.a.a;
-								return $author$project$Voting$Voting$GiveRightToVote(address);
-							case 'delegateVote':
-								var address = toEncode.b.a.a;
-								return $author$project$Voting$Voting$DelegateVote(address);
-							default:
-								break _v0$5;
-						}
-					case 'RInt':
-						if (toEncode.a === 'sendVote') {
-							var vote = toEncode.b.a.a;
-							return $author$project$Voting$Voting$SendVote(vote);
-						} else {
-							break _v0$5;
-						}
-					default:
-						break _v0$5;
+				if ((toEncode.a === 'balanceOf') && (toEncode.b.a.$ === 'RAddress')) {
+					var address = toEncode.b.a.a;
+					return $author$project$ERC20$ERC20$BalanceOf(address);
+				} else {
+					break _v0$9;
 				}
-			case 'None':
-				switch (toEncode.a) {
-					case 'getWinningProposal':
-						var _v1 = toEncode.b;
-						return $author$project$Voting$Voting$GetWinningProposal;
-					case 'getWinningProposalName':
-						var _v2 = toEncode.b;
-						return $author$project$Voting$Voting$GetWinningProposalName;
-					default:
-						break _v0$5;
+			case 'Tuple2':
+				if (toEncode.b.a.a.$ === 'RAddress') {
+					switch (toEncode.b.a.b.$) {
+						case 'RAddress':
+							if (toEncode.a === 'allowance') {
+								var _v2 = toEncode.b.a;
+								var owner = _v2.a.a;
+								var spender = _v2.b.a;
+								return A2($author$project$ERC20$ERC20$GetAllowance, owner, spender);
+							} else {
+								break _v0$9;
+							}
+						case 'RInt':
+							switch (toEncode.a) {
+								case 'transfer':
+									var _v1 = toEncode.b.a;
+									var address = _v1.a.a;
+									var amount = _v1.b.a;
+									return A2($author$project$ERC20$ERC20$Transfer, address, amount);
+								case 'approve':
+									var _v3 = toEncode.b.a;
+									var owner = _v3.a.a;
+									var amount = _v3.b.a;
+									return A2($author$project$ERC20$ERC20$Approve, owner, amount);
+								default:
+									break _v0$9;
+							}
+						default:
+							break _v0$9;
+					}
+				} else {
+					break _v0$9;
+				}
+			case 'Tuple3':
+				if ((((toEncode.a === 'transferFrom') && (toEncode.b.a.a.$ === 'RAddress')) && (toEncode.b.a.b.$ === 'RAddress')) && (toEncode.b.a.c.$ === 'RInt')) {
+					var _v4 = toEncode.b.a;
+					var sender = _v4.a.a;
+					var recipient = _v4.b.a;
+					var amount = _v4.c.a;
+					return A3($author$project$ERC20$ERC20$TransferFrom, sender, recipient, amount);
+				} else {
+					break _v0$9;
 				}
 			default:
-				break _v0$5;
+				switch (toEncode.a) {
+					case 'name':
+						var _v5 = toEncode.b;
+						return $author$project$ERC20$ERC20$GetName;
+					case 'symbol':
+						var _v6 = toEncode.b;
+						return $author$project$ERC20$ERC20$GetSymbol;
+					case 'decimals':
+						var _v7 = toEncode.b;
+						return $author$project$ERC20$ERC20$GetDecimals;
+					case 'totalSupply':
+						var _v8 = toEncode.b;
+						return $author$project$ERC20$ERC20$GetTotalSupply;
+					default:
+						break _v0$9;
+				}
 		}
 	}
 	return $author$project$Concept$Core$throw('Invalid Call');
@@ -5505,9 +5551,12 @@ var $elm$core$Result$Ok = function (a) {
 var $elm$json$Json$Decode$OneOf = function (a) {
 	return {$: 'OneOf', a: a};
 };
+var $elm$core$Basics$False = {$: 'False'};
+var $elm$core$Basics$add = _Basics_add;
 var $elm$core$Maybe$Just = function (a) {
 	return {$: 'Just', a: a};
 };
+var $elm$core$Maybe$Nothing = {$: 'Nothing'};
 var $elm$core$String$all = _String_all;
 var $elm$core$Basics$and = _Basics_and;
 var $elm$core$Basics$append = _Utils_append;
@@ -5531,6 +5580,25 @@ var $elm$json$Json$Decode$indent = function (str) {
 		'\n    ',
 		A2($elm$core$String$split, '\n', str));
 };
+var $elm$core$List$foldl = F3(
+	function (func, acc, list) {
+		foldl:
+		while (true) {
+			if (!list.b) {
+				return acc;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				var $temp$func = func,
+					$temp$acc = A2(func, x, acc),
+					$temp$list = xs;
+				func = $temp$func;
+				acc = $temp$acc;
+				list = $temp$list;
+				continue foldl;
+			}
+		}
+	});
 var $elm$core$List$length = function (xs) {
 	return A3(
 		$elm$core$List$foldl,
@@ -5595,6 +5663,9 @@ var $elm$core$Char$isDigit = function (_char) {
 };
 var $elm$core$Char$isAlphaNum = function (_char) {
 	return $elm$core$Char$isLower(_char) || ($elm$core$Char$isUpper(_char) || $elm$core$Char$isDigit(_char));
+};
+var $elm$core$List$reverse = function (list) {
+	return A3($elm$core$List$foldl, $elm$core$List$cons, _List_Nil, list);
 };
 var $elm$core$String$uncons = _String_uncons;
 var $elm$json$Json$Decode$errorOneOf = F2(
@@ -5731,6 +5802,7 @@ var $elm$core$Basics$apR = F2(
 var $elm$core$Basics$eq = _Utils_equal;
 var $elm$core$Basics$floor = _Basics_floor;
 var $elm$core$Elm$JsArray$length = _JsArray_length;
+var $elm$core$Basics$gt = _Utils_gt;
 var $elm$core$Basics$max = F2(
 	function (x, y) {
 		return (_Utils_cmp(x, y) > 0) ? x : y;
@@ -5966,6 +6038,75 @@ var $elm$html$Html$Attributes$href = function (url) {
 		'href',
 		_VirtualDom_noJavaScriptUri(url));
 };
+var $elm$core$List$foldrHelper = F4(
+	function (fn, acc, ctr, ls) {
+		if (!ls.b) {
+			return acc;
+		} else {
+			var a = ls.a;
+			var r1 = ls.b;
+			if (!r1.b) {
+				return A2(fn, a, acc);
+			} else {
+				var b = r1.a;
+				var r2 = r1.b;
+				if (!r2.b) {
+					return A2(
+						fn,
+						a,
+						A2(fn, b, acc));
+				} else {
+					var c = r2.a;
+					var r3 = r2.b;
+					if (!r3.b) {
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(fn, c, acc)));
+					} else {
+						var d = r3.a;
+						var r4 = r3.b;
+						var res = (ctr > 500) ? A3(
+							$elm$core$List$foldl,
+							fn,
+							acc,
+							$elm$core$List$reverse(r4)) : A4($elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(
+									fn,
+									c,
+									A2(fn, d, res))));
+					}
+				}
+			}
+		}
+	});
+var $elm$core$List$foldr = F3(
+	function (fn, acc, ls) {
+		return A4($elm$core$List$foldrHelper, fn, acc, 0, ls);
+	});
+var $elm$core$List$map = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, acc) {
+					return A2(
+						$elm$core$List$cons,
+						f(x),
+						acc);
+				}),
+			_List_Nil,
+			xs);
+	});
 var $elm$html$Html$p = _VirtualDom_node('p');
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $elm$html$Html$code = _VirtualDom_node('code');
@@ -6569,7 +6710,6 @@ var $elm$browser$Debugger$Main$cornerView = function (model) {
 		$elm$browser$Debugger$History$size(model.history),
 		model.overlay);
 };
-var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$core$Set$foldr = F3(
 	function (func, initialState, _v0) {
 		var dict = _v0.a;
@@ -6596,110 +6736,6 @@ var $elm$browser$Debugger$Main$getUserModel = function (model) {
 };
 var $elm$browser$Debugger$Main$initialWindowHeight = 420;
 var $elm$browser$Debugger$Main$initialWindowWidth = 900;
-var $elm$core$Dict$Red = {$: 'Red'};
-var $elm$core$Dict$balance = F5(
-	function (color, key, value, left, right) {
-		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
-			var _v1 = right.a;
-			var rK = right.b;
-			var rV = right.c;
-			var rLeft = right.d;
-			var rRight = right.e;
-			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
-				var _v3 = left.a;
-				var lK = left.b;
-				var lV = left.c;
-				var lLeft = left.d;
-				var lRight = left.e;
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Red,
-					key,
-					value,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, lK, lV, lLeft, lRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rLeft, rRight));
-			} else {
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					color,
-					rK,
-					rV,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, left, rLeft),
-					rRight);
-			}
-		} else {
-			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
-				var _v5 = left.a;
-				var lK = left.b;
-				var lV = left.c;
-				var _v6 = left.d;
-				var _v7 = _v6.a;
-				var llK = _v6.b;
-				var llV = _v6.c;
-				var llLeft = _v6.d;
-				var llRight = _v6.e;
-				var lRight = left.e;
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Red,
-					lK,
-					lV,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, key, value, lRight, right));
-			} else {
-				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
-			}
-		}
-	});
-var $elm$core$Basics$compare = _Utils_compare;
-var $elm$core$Dict$insertHelp = F3(
-	function (key, value, dict) {
-		if (dict.$ === 'RBEmpty_elm_builtin') {
-			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
-		} else {
-			var nColor = dict.a;
-			var nKey = dict.b;
-			var nValue = dict.c;
-			var nLeft = dict.d;
-			var nRight = dict.e;
-			var _v1 = A2($elm$core$Basics$compare, key, nKey);
-			switch (_v1.$) {
-				case 'LT':
-					return A5(
-						$elm$core$Dict$balance,
-						nColor,
-						nKey,
-						nValue,
-						A3($elm$core$Dict$insertHelp, key, value, nLeft),
-						nRight);
-				case 'EQ':
-					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
-				default:
-					return A5(
-						$elm$core$Dict$balance,
-						nColor,
-						nKey,
-						nValue,
-						nLeft,
-						A3($elm$core$Dict$insertHelp, key, value, nRight));
-			}
-		}
-	});
-var $elm$core$Dict$insert = F3(
-	function (key, value, dict) {
-		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
-		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
-			var _v1 = _v0.a;
-			var k = _v0.b;
-			var v = _v0.c;
-			var l = _v0.d;
-			var r = _v0.e;
-			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
-		} else {
-			var x = _v0;
-			return x;
-		}
-	});
 var $elm$browser$Debugger$Main$cachedHistory = function (model) {
 	var _v0 = model.state;
 	if (_v0.$ === 'Running') {
@@ -10954,10 +10990,6 @@ var $elm$random$Random$int = F2(
 var $elm$random$Random$maxInt = 2147483647;
 var $elm$random$Random$minInt = -2147483648;
 var $author$project$Concept$Contract$anyInt = A2($elm$random$Random$int, $elm$random$Random$minInt, $elm$random$Random$maxInt);
-var $author$project$Concept$Mapping$empty = function () {
-	var dict = $elm$core$Dict$empty;
-	return $author$project$Concept$Mapping$Mapping(dict);
-}();
 var $elm$random$Random$Generate = function (a) {
 	return {$: 'Generate', a: a};
 };
@@ -12279,15 +12311,6 @@ var $author$project$Concept$Mapping$get = F2(
 		var value = A2($elm$core$Dict$get, comparable, dict);
 		return value;
 	});
-var $author$project$Concept$Mapping$insert = F3(
-	function (comparable, value, mapping) {
-		var dict = function () {
-			var d = mapping.a;
-			return d;
-		}();
-		var internalDict = A3($elm$core$Dict$insert, comparable, value, dict);
-		return $author$project$Concept$Mapping$Mapping(internalDict);
-	});
 var $elm$core$Debug$log = _Debug_log;
 var $author$project$Concept$Contract$update = F3(
 	function (contract, msg, model) {
@@ -12979,281 +13002,315 @@ var $author$project$Concept$Contract$initialize = function (contract) {
 		});
 };
 var $author$project$Concept$Contract$IAddress = {$: 'IAddress'};
-var $author$project$Concept$Contract$IInt = {$: 'IInt'};
 var $author$project$Concept$Contract$ISingle = function (a) {
 	return {$: 'ISingle', a: a};
 };
-var $author$project$Voting$Voting$signatures = _List_fromArray(
+var $author$project$Concept$Contract$ITuple2 = function (a) {
+	return {$: 'ITuple2', a: a};
+};
+var $author$project$ERC20$ERC20$signatures = _List_fromArray(
 	[
 		_Utils_Tuple2(
-		'giveRightToVote',
+		'balanceOf',
 		A2(
 			$author$project$Concept$Contract$Signature,
 			$author$project$Concept$Contract$ISingle($author$project$Concept$Contract$IAddress),
-			$author$project$Concept$Contract$INone)),
+			$author$project$Concept$Contract$ISingle($author$project$Concept$Contract$IInt))),
 		_Utils_Tuple2(
-		'delegateVote',
+		'transfer',
 		A2(
 			$author$project$Concept$Contract$Signature,
-			$author$project$Concept$Contract$ISingle($author$project$Concept$Contract$IAddress),
-			$author$project$Concept$Contract$INone)),
+			$author$project$Concept$Contract$ITuple2(
+				_Utils_Tuple2($author$project$Concept$Contract$IAddress, $author$project$Concept$Contract$IInt)),
+			$author$project$Concept$Contract$ISingle($author$project$Concept$Contract$IInt))),
 		_Utils_Tuple2(
-		'sendVote',
+		'allowance',
 		A2(
 			$author$project$Concept$Contract$Signature,
-			$author$project$Concept$Contract$ISingle($author$project$Concept$Contract$IInt),
-			$author$project$Concept$Contract$INone)),
+			$author$project$Concept$Contract$ITuple2(
+				_Utils_Tuple2($author$project$Concept$Contract$IAddress, $author$project$Concept$Contract$IAddress)),
+			$author$project$Concept$Contract$ISingle($author$project$Concept$Contract$IInt))),
 		_Utils_Tuple2(
-		'getWinningProposal',
+		'approve',
+		A2(
+			$author$project$Concept$Contract$Signature,
+			$author$project$Concept$Contract$ITuple2(
+				_Utils_Tuple2($author$project$Concept$Contract$IAddress, $author$project$Concept$Contract$IInt)),
+			$author$project$Concept$Contract$ISingle($author$project$Concept$Contract$IInt))),
+		_Utils_Tuple2(
+		'transferFrom',
+		A2(
+			$author$project$Concept$Contract$Signature,
+			$author$project$Concept$Contract$ITuple3(
+				_Utils_Tuple3($author$project$Concept$Contract$IAddress, $author$project$Concept$Contract$IAddress, $author$project$Concept$Contract$IInt)),
+			$author$project$Concept$Contract$ISingle($author$project$Concept$Contract$IInt))),
+		_Utils_Tuple2(
+		'name',
+		A2(
+			$author$project$Concept$Contract$Signature,
+			$author$project$Concept$Contract$INone,
+			$author$project$Concept$Contract$ISingle($author$project$Concept$Contract$IString))),
+		_Utils_Tuple2(
+		'symbol',
+		A2(
+			$author$project$Concept$Contract$Signature,
+			$author$project$Concept$Contract$INone,
+			$author$project$Concept$Contract$ISingle($author$project$Concept$Contract$IString))),
+		_Utils_Tuple2(
+		'decimals',
 		A2(
 			$author$project$Concept$Contract$Signature,
 			$author$project$Concept$Contract$INone,
 			$author$project$Concept$Contract$ISingle($author$project$Concept$Contract$IInt))),
 		_Utils_Tuple2(
-		'getWinningProposalName',
+		'totalSupply',
 		A2(
 			$author$project$Concept$Contract$Signature,
 			$author$project$Concept$Contract$INone,
-			$author$project$Concept$Contract$ISingle($author$project$Concept$Contract$IString)))
+			$author$project$Concept$Contract$ISingle($author$project$Concept$Contract$IInt)))
 	]);
 var $author$project$Concept$Core$defaultValues = function (a) {
 	return a;
 };
 var $author$project$Concept$Core$zeroAddress = '0x0000000000000000000000000000000000000000';
-var $author$project$Voting$Voting$findDelegate = F3(
-	function (sender, voters, to) {
-		var delegate = function () {
-			var maybeDelegate = A2($author$project$Concept$Mapping$get, to, voters);
-			if (maybeDelegate.$ === 'Just') {
-				var d = maybeDelegate.a;
-				var _v2 = d.delegate;
-				if (_v2.$ === 'Just') {
-					var address = _v2.a;
-					return A3($author$project$Voting$Voting$findDelegate, sender, voters, address);
-				} else {
-					return to;
-				}
-			} else {
-				return $author$project$Concept$Core$defaultValues($author$project$Concept$Core$zeroAddress);
-			}
-		}();
-		var _v0 = _Utils_eq(to, sender) ? $author$project$Concept$Core$throw('Found loop in delegation.') : $elm$core$Maybe$Nothing;
-		return delegate;
-	});
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $elm$core$List$sortBy = _List_sortBy;
-var $author$project$Voting$Voting$update = F3(
+var $author$project$ERC20$ERC20$update = F3(
 	function (msg, global, model) {
 		switch (msg.$) {
-			case 'GiveRightToVote':
+			case 'BalanceOf':
 				var address = msg.a;
-				var voters = A3(
-					$author$project$Concept$Mapping$insert,
-					address,
-					A4($author$project$Voting$Voting$Voter, 1, false, $elm$core$Maybe$Nothing, $elm$core$Maybe$Nothing),
-					model.voters);
-				var hasVoted = function () {
-					var maybeVoter = A2($author$project$Concept$Mapping$get, address, model.voters);
-					if (maybeVoter.$ === 'Just') {
-						var voter = maybeVoter.a;
-						return voter.voted;
+				var balance = function () {
+					var owner = A2($author$project$Concept$Mapping$get, address, model.balances);
+					if (owner.$ === 'Just') {
+						var o = owner.a;
+						return o;
 					} else {
-						return false;
+						return $author$project$Concept$Core$defaultValues(0);
+					}
+				}();
+				return _Utils_Tuple3(
+					_List_Nil,
+					model,
+					$author$project$Concept$Contract$Single(
+						$author$project$Concept$Contract$RInt(balance)));
+			case 'Transfer':
+				var address = msg.a;
+				var amount = msg.b;
+				var senderBalance = function () {
+					var owner = A2($author$project$Concept$Mapping$get, global.msg.sender, model.balances);
+					if (owner.$ === 'Just') {
+						var balance = owner.a;
+						return balance;
+					} else {
+						return $author$project$Concept$Core$defaultValues(0);
+					}
+				}();
+				var recipientBalance = function () {
+					var owner = A2($author$project$Concept$Mapping$get, address, model.balances);
+					if (owner.$ === 'Just') {
+						var balance = owner.a;
+						return balance;
+					} else {
+						return $author$project$Concept$Core$defaultValues(0);
 					}
 				}();
 				return _Utils_Tuple3(
 					_List_fromArray(
 						[
 							_Utils_Tuple2(
-							_Utils_eq(global.msg.sender, model.chairperson),
-							'Only chairperson can give right to vote.'),
-							_Utils_Tuple2(!hasVoted, 'The voter already voted.')
-						]),
-					_Utils_update(
-						model,
-						{voters: voters}),
-					$author$project$Concept$Contract$None);
-			case 'DelegateVote':
-				var address = msg.a;
-				var delegateAddress = A3($author$project$Voting$Voting$findDelegate, global.msg.sender, model.voters, address);
-				var _v2 = function () {
-					var maybeVoter = A2($author$project$Concept$Mapping$get, global.msg.sender, model.voters);
-					if (maybeVoter.$ === 'Just') {
-						var v = maybeVoter.a;
-						var updatedVoter = _Utils_update(
-							v,
-							{
-								delegate: $elm$core$Maybe$Just(delegateAddress),
-								voted: true
-							});
-						return _Utils_Tuple2(v.voted, updatedVoter);
-					} else {
-						return _Utils_Tuple2(
-							false,
-							$author$project$Concept$Core$defaultValues(
-								A4($author$project$Voting$Voting$Voter, 0, false, $elm$core$Maybe$Nothing, $elm$core$Maybe$Nothing)));
-					}
-				}();
-				var hasVoted = _v2.a;
-				var voter = _v2.b;
-				var delegate = function () {
-					var maybeDelegate = A2($author$project$Concept$Mapping$get, delegateAddress, model.voters);
-					if (maybeDelegate.$ === 'Just') {
-						var d = maybeDelegate.a;
-						var weight = (!d.voted) ? (d.weight + voter.weight) : d.weight;
-						return _Utils_update(
-							d,
-							{weight: weight});
-					} else {
-						return $author$project$Concept$Core$defaultValues(
-							A4($author$project$Voting$Voting$Voter, 0, false, $elm$core$Maybe$Nothing, $elm$core$Maybe$Nothing));
-					}
-				}();
-				var proposals = delegate.voted ? A2(
-					$elm$core$List$indexedMap,
-					function (i) {
-						return function (proposal) {
-							return _Utils_eq(
-								A2($elm$core$Maybe$withDefault, -1, delegate.vote),
-								i) ? _Utils_update(
-								proposal,
-								{voteCount: proposal.voteCount + voter.weight}) : proposal;
-						};
-					},
-					model.proposals) : model.proposals;
-				return _Utils_Tuple3(
-					_List_fromArray(
-						[
+							!_Utils_eq(global.msg.sender, $author$project$Concept$Core$zeroAddress),
+							'ERC20: transfer from the zero address'),
 							_Utils_Tuple2(
-							!_Utils_eq(address, global.msg.sender),
-							'Self-delegation is disallowed.'),
-							_Utils_Tuple2(!hasVoted, 'You already voted.'),
+							!_Utils_eq(address, $author$project$Concept$Core$zeroAddress),
+							'ERC20: transfer to the zero address'),
 							_Utils_Tuple2(
-							!_Utils_eq(delegateAddress, $author$project$Concept$Core$zeroAddress),
-							'Zero address can\'t be a voter.')
+							_Utils_cmp(senderBalance, amount) > -1,
+							'ERC20: transfer amount exceeds balance')
 						]),
 					_Utils_update(
 						model,
 						{
-							proposals: proposals,
-							voters: A3(
+							balances: A3(
 								$author$project$Concept$Mapping$insert,
-								delegateAddress,
-								delegate,
-								A3($author$project$Concept$Mapping$insert, global.msg.sender, voter, model.voters))
+								address,
+								recipientBalance + amount,
+								A3($author$project$Concept$Mapping$insert, global.msg.sender, senderBalance - amount, model.balances))
 						}),
-					$author$project$Concept$Contract$None);
-			case 'SendVote':
-				var vote = msg.a;
-				var _v5 = function () {
-					var maybeVoter = A2($author$project$Concept$Mapping$get, global.msg.sender, model.voters);
-					if (maybeVoter.$ === 'Just') {
-						var v = maybeVoter.a;
-						var updatedVoter = _Utils_update(
-							v,
-							{
-								vote: $elm$core$Maybe$Just(vote),
-								voted: true
-							});
-						return _Utils_Tuple2(v.voted, updatedVoter);
+					$author$project$Concept$Contract$Single(
+						$author$project$Concept$Contract$RInt(1)));
+			case 'GetAllowance':
+				var owner = msg.a;
+				var spender = msg.b;
+				var allowancesMapping = function () {
+					var o = A2($author$project$Concept$Mapping$get, owner, model.allowances);
+					if (o.$ === 'Just') {
+						var mapping = o.a;
+						return mapping;
 					} else {
-						return _Utils_Tuple2(
-							false,
-							$author$project$Concept$Core$defaultValues(
-								A4($author$project$Voting$Voting$Voter, 0, false, $elm$core$Maybe$Nothing, $elm$core$Maybe$Nothing)));
+						return $author$project$Concept$Core$defaultValues($author$project$Concept$Mapping$empty);
 					}
 				}();
-				var hasVoted = _v5.a;
-				var voter = _v5.b;
-				var proposals = A2(
-					$elm$core$List$indexedMap,
-					function (i) {
-						return function (proposal) {
-							return _Utils_eq(vote, i) ? _Utils_update(
-								proposal,
-								{voteCount: proposal.voteCount + voter.weight}) : proposal;
-						};
-					},
-					model.proposals);
+				var allowedBalance = function () {
+					var a = A2($author$project$Concept$Mapping$get, spender, allowancesMapping);
+					if (a.$ === 'Just') {
+						var balance = a.a;
+						return balance;
+					} else {
+						return $author$project$Concept$Core$defaultValues(0);
+					}
+				}();
+				return _Utils_Tuple3(
+					_List_Nil,
+					model,
+					$author$project$Concept$Contract$Single(
+						$author$project$Concept$Contract$RInt(allowedBalance)));
+			case 'Approve':
+				var spender = msg.a;
+				var amount = msg.b;
+				var allowancesMapping = function () {
+					var o = A2($author$project$Concept$Mapping$get, global.msg.sender, model.allowances);
+					if (o.$ === 'Just') {
+						var mapping = o.a;
+						return mapping;
+					} else {
+						return $author$project$Concept$Core$defaultValues($author$project$Concept$Mapping$empty);
+					}
+				}();
+				var allowances = A3(
+					$author$project$Concept$Mapping$insert,
+					global.msg.sender,
+					A3($author$project$Concept$Mapping$insert, spender, amount, allowancesMapping),
+					model.allowances);
 				return _Utils_Tuple3(
 					_List_fromArray(
 						[
-							_Utils_Tuple2(!(!voter.weight), 'Has no right to vote.'),
-							_Utils_Tuple2(!hasVoted, 'You already voted.')
+							_Utils_Tuple2(
+							!_Utils_eq(global.msg.sender, $author$project$Concept$Core$zeroAddress),
+							'ERC20: transfer from the zero address'),
+							_Utils_Tuple2(
+							!_Utils_eq(spender, $author$project$Concept$Core$zeroAddress),
+							'ERC20: transfer to the zero address')
+						]),
+					_Utils_update(
+						model,
+						{allowances: allowances}),
+					$author$project$Concept$Contract$Single(
+						$author$project$Concept$Contract$RInt(1)));
+			case 'TransferFrom':
+				var sender = msg.a;
+				var recipient = msg.b;
+				var amount = msg.c;
+				var senderBalance = function () {
+					var owner = A2($author$project$Concept$Mapping$get, sender, model.balances);
+					if (owner.$ === 'Just') {
+						var balance = owner.a;
+						return balance;
+					} else {
+						return $author$project$Concept$Core$defaultValues(0);
+					}
+				}();
+				var recipientBalance = function () {
+					var owner = A2($author$project$Concept$Mapping$get, recipient, model.balances);
+					if (owner.$ === 'Just') {
+						var balance = owner.a;
+						return balance;
+					} else {
+						return $author$project$Concept$Core$defaultValues(0);
+					}
+				}();
+				var allowancesMapping = function () {
+					var o = A2($author$project$Concept$Mapping$get, sender, model.allowances);
+					if (o.$ === 'Just') {
+						var mapping = o.a;
+						return mapping;
+					} else {
+						return $author$project$Concept$Core$defaultValues($author$project$Concept$Mapping$empty);
+					}
+				}();
+				var allowedBalance = function () {
+					var a = A2($author$project$Concept$Mapping$get, global.msg.sender, allowancesMapping);
+					if (a.$ === 'Just') {
+						var balance = a.a;
+						return balance;
+					} else {
+						return $author$project$Concept$Core$defaultValues(0);
+					}
+				}();
+				var allowances = A3(
+					$author$project$Concept$Mapping$insert,
+					sender,
+					A3($author$project$Concept$Mapping$insert, global.msg.sender, allowedBalance - amount, allowancesMapping),
+					model.allowances);
+				return _Utils_Tuple3(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							!_Utils_eq(sender, $author$project$Concept$Core$zeroAddress),
+							'ERC20: transfer from the zero address'),
+							_Utils_Tuple2(
+							!_Utils_eq(recipient, $author$project$Concept$Core$zeroAddress),
+							'ERC20: transfer to the zero address'),
+							_Utils_Tuple2(
+							_Utils_cmp(senderBalance, amount) > -1,
+							'ERC20: transfer amount exceeds balance'),
+							_Utils_Tuple2(
+							_Utils_cmp(allowedBalance, amount) > -1,
+							'ERC20: transfer amount exceeds allowance')
 						]),
 					_Utils_update(
 						model,
 						{
-							proposals: proposals,
-							voters: A3($author$project$Concept$Mapping$insert, global.msg.sender, voter, model.voters)
+							allowances: allowances,
+							balances: A3(
+								$author$project$Concept$Mapping$insert,
+								recipient,
+								recipientBalance + amount,
+								A3($author$project$Concept$Mapping$insert, sender, senderBalance - amount, model.balances))
 						}),
-					$author$project$Concept$Contract$None);
-			case 'GetWinningProposal':
-				var _v7 = A2(
-					$elm$core$Maybe$withDefault,
-					_Utils_Tuple2(-1, 0),
-					$elm$core$List$head(
-						$elm$core$List$reverse(
-							A2(
-								$elm$core$List$sortBy,
-								$elm$core$Tuple$second,
-								A2(
-									$elm$core$List$indexedMap,
-									F2(
-										function (i, p) {
-											return _Utils_Tuple2(i, p.voteCount);
-										}),
-									model.proposals)))));
-				var proposalIndex = _v7.a;
+					$author$project$Concept$Contract$Single(
+						$author$project$Concept$Contract$RInt(1)));
+			case 'GetName':
 				return _Utils_Tuple3(
 					_List_Nil,
 					model,
 					$author$project$Concept$Contract$Single(
-						$author$project$Concept$Contract$RInt(proposalIndex)));
+						$author$project$Concept$Contract$RString(model.name)));
+			case 'GetSymbol':
+				return _Utils_Tuple3(
+					_List_Nil,
+					model,
+					$author$project$Concept$Contract$Single(
+						$author$project$Concept$Contract$RString(model.symbol)));
+			case 'GetDecimals':
+				return _Utils_Tuple3(
+					_List_Nil,
+					model,
+					$author$project$Concept$Contract$Single(
+						$author$project$Concept$Contract$RInt(model.decimals)));
 			default:
-				var proposal = A2(
-					$elm$core$Maybe$withDefault,
-					A2($author$project$Voting$Voting$Proposal, '', 0),
-					$elm$core$List$head(
-						$elm$core$List$reverse(
-							A2(
-								$elm$core$List$sortBy,
-								function ($) {
-									return $.voteCount;
-								},
-								model.proposals))));
 				return _Utils_Tuple3(
 					_List_Nil,
 					model,
 					$author$project$Concept$Contract$Single(
-						$author$project$Concept$Contract$RString(proposal.name)));
+						$author$project$Concept$Contract$RInt(model.totalSupply)));
 		}
 	});
-var $author$project$Voting$Voting$main = $author$project$Concept$Contract$initialize(
+var $author$project$ERC20$ERC20$main = $author$project$Concept$Contract$initialize(
 	A4(
 		$author$project$Concept$Contract$Contract,
 		_Utils_Tuple2(
-			$author$project$Voting$Voting$constructor,
+			$author$project$ERC20$ERC20$constructor,
 			A2(
 				$author$project$Concept$Contract$Signature,
-				$author$project$Concept$Contract$ITuple2(
-					_Utils_Tuple2($author$project$Concept$Contract$IString, $author$project$Concept$Contract$IString)),
+				$author$project$Concept$Contract$ITuple3(
+					_Utils_Tuple3($author$project$Concept$Contract$IString, $author$project$Concept$Contract$IString, $author$project$Concept$Contract$IInt)),
 				$author$project$Concept$Contract$INone)),
-		$author$project$Voting$Voting$update,
-		$author$project$Voting$Voting$signatures,
-		$author$project$Voting$Voting$encodeMsg));
-_Platform_export({'Voting':{'Voting':{'init':$author$project$Voting$Voting$main(
+		$author$project$ERC20$ERC20$update,
+		$author$project$ERC20$ERC20$signatures,
+		$author$project$ERC20$ERC20$encodeMsg));
+_Platform_export({'ERC20':{'ERC20':{'init':$author$project$ERC20$ERC20$main(
 	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Concept.Contract.Msg","aliases":{"Concept.Core.Address":{"args":[],"type":"String.String"},"Concept.Core.Block":{"args":[],"type":"{ coinbase : Concept.Core.Address, difficulty : Basics.Int, gasLimit : Basics.Int, number : Basics.Int, timestamp : Basics.Int }"},"Concept.Core.Global":{"args":[],"type":"{ msg : Concept.Core.Msg, block : Concept.Core.Block }"},"Concept.Core.Msg":{"args":[],"type":"{ sender : Concept.Core.PayableAddress, data : String.String, sig : String.String, value : Basics.Int }"},"Concept.Core.PayableAddress":{"args":[],"type":"String.String"}},"unions":{"Concept.Contract.Msg":{"args":[],"tags":{"GenerateGlobal":["Concept.Contract.Msg","Time.Posix"],"SetGlobal":["Concept.Contract.Msg","Concept.Core.Global"],"GenerateNewAddress":[],"GetAddressSeed":["Basics.Int"],"SetDeployer":["Concept.Core.Address"],"SetValue":["Basics.Int"],"DeployIntent":["Concept.Contract.Msg"],"Deploy":["Concept.Contract.FunctionIO"],"ContractCallIntent":["Concept.Contract.Msg"],"ContractCall":["String.String","Concept.Contract.FunctionIO"],"SetForm":["String.String","Concept.Contract.Position","Concept.Contract.Basic"]}},"Concept.Contract.Basic":{"args":[],"tags":{"RAddress":["Concept.Core.Address"],"RString":["String.String"],"RInt":["Basics.Int"]}},"Concept.Contract.FunctionIO":{"args":[],"tags":{"None":[],"Single":["Concept.Contract.Basic"],"Tuple2":["( Concept.Contract.Basic, Concept.Contract.Basic )"],"Tuple3":["( Concept.Contract.Basic, Concept.Contract.Basic, Concept.Contract.Basic )"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Concept.Contract.Position":{"args":[],"tags":{"P1":[],"P2":[],"P3":[]}},"Time.Posix":{"args":[],"tags":{"Posix":["Basics.Int"]}},"String.String":{"args":[],"tags":{"String":[]}}}}})}}});}(this));
 
-  var app = Elm.Voting.Voting.init({ node: document.getElementById("elm") });
+  var app = Elm.ERC20.ERC20.init({ node: document.getElementById("elm") });
 }
 catch (e)
 {
