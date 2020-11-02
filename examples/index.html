@@ -13162,8 +13162,9 @@ var $author$project$ERC20$ERC20$update = F3(
 						return $author$project$Concept$Core$defaultValues(0);
 					}
 				}();
+				var updatedBalance = A3($author$project$Concept$Mapping$insert, global.msg.sender, senderBalance - amount, model.balances);
 				var recipientBalance = function () {
-					var owner = A2($author$project$Concept$Mapping$get, address, model.balances);
+					var owner = A2($author$project$Concept$Mapping$get, address, updatedBalance);
 					if (owner.$ === 'Just') {
 						var balance = owner.a;
 						return balance;
@@ -13187,11 +13188,7 @@ var $author$project$ERC20$ERC20$update = F3(
 					_Utils_update(
 						model,
 						{
-							balances: A3(
-								$author$project$Concept$Mapping$insert,
-								address,
-								recipientBalance + amount,
-								A3($author$project$Concept$Mapping$insert, global.msg.sender, senderBalance - amount, model.balances))
+							balances: A3($author$project$Concept$Mapping$insert, address, recipientBalance + amount, updatedBalance)
 						}),
 					$author$project$Concept$Contract$Single(
 						$author$project$Concept$Contract$RBool(true)));
@@ -13266,8 +13263,9 @@ var $author$project$ERC20$ERC20$update = F3(
 						return $author$project$Concept$Core$defaultValues(0);
 					}
 				}();
+				var updatedBalance = A3($author$project$Concept$Mapping$insert, sender, senderBalance - amount, model.balances);
 				var recipientBalance = function () {
-					var owner = A2($author$project$Concept$Mapping$get, recipient, model.balances);
+					var owner = A2($author$project$Concept$Mapping$get, recipient, updatedBalance);
 					if (owner.$ === 'Just') {
 						var balance = owner.a;
 						return balance;
@@ -13318,11 +13316,7 @@ var $author$project$ERC20$ERC20$update = F3(
 						model,
 						{
 							allowances: allowances,
-							balances: A3(
-								$author$project$Concept$Mapping$insert,
-								recipient,
-								recipientBalance + amount,
-								A3($author$project$Concept$Mapping$insert, sender, senderBalance - amount, model.balances))
+							balances: A3($author$project$Concept$Mapping$insert, recipient, recipientBalance + amount, updatedBalance)
 						}),
 					$author$project$Concept$Contract$Single(
 						$author$project$Concept$Contract$RBool(true)));

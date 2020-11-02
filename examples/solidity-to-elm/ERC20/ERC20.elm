@@ -98,10 +98,13 @@ update msg global model =
                         Nothing ->
                             defaultValues 0
 
+                updatedBalance =
+                    Mapping.insert global.msg.sender (senderBalance - amount) model.balances
+
                 recipientBalance =
                     let
                         owner =
-                            Mapping.get address model.balances
+                            Mapping.get address updatedBalance
                     in
                     case owner of
                         Just balance ->
@@ -118,7 +121,7 @@ update msg global model =
                 | balances =
                     Mapping.insert address
                         (recipientBalance + amount)
-                        (Mapping.insert global.msg.sender (senderBalance - amount) model.balances)
+                        updatedBalance
               }
             , Single (RBool True)
             )
@@ -191,10 +194,13 @@ update msg global model =
                         Nothing ->
                             defaultValues 0
 
+                updatedBalance =
+                    Mapping.insert sender (senderBalance - amount) model.balances
+
                 recipientBalance =
                     let
                         owner =
-                            Mapping.get recipient model.balances
+                            Mapping.get recipient updatedBalance
                     in
                     case owner of
                         Just balance ->
@@ -242,7 +248,7 @@ update msg global model =
                 , balances =
                     Mapping.insert recipient
                         (recipientBalance + amount)
-                        (Mapping.insert sender (senderBalance - amount) model.balances)
+                        updatedBalance
               }
             , Single (RBool True)
             )
