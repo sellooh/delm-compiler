@@ -120,8 +120,7 @@ update msg global model =
                         (recipientBalance + amount)
                         (Mapping.insert global.msg.sender (senderBalance - amount) model.balances)
               }
-              -- TODO Bool value
-            , Single (RInt 1)
+            , Single (RBool True)
             )
 
         GetAllowance owner spender ->
@@ -175,8 +174,7 @@ update msg global model =
               , ( spender /= zeroAddress, "ERC20: transfer to the zero address" )
               ]
             , { model | allowances = allowances }
-              -- TODO Bool value
-            , Single (RInt 1)
+            , Single (RBool True)
             )
 
         TransferFrom sender recipient amount ->
@@ -246,8 +244,7 @@ update msg global model =
                         (recipientBalance + amount)
                         (Mapping.insert sender (senderBalance - amount) model.balances)
               }
-              -- TODO Bool value
-            , Single (RInt 1)
+            , Single (RBool True)
             )
 
         GetName ->
@@ -266,10 +263,10 @@ update msg global model =
 signatures : List ( String, Signature )
 signatures =
     [ ( "balanceOf", Signature (ISingle IAddress) (ISingle IInt) )
-    , ( "transfer", Signature (ITuple2 ( IAddress, IInt )) (ISingle IInt) )
-    , ( "allowance", Signature (ITuple2 ( IAddress, IAddress )) (ISingle IInt) )
-    , ( "approve", Signature (ITuple2 ( IAddress, IInt )) (ISingle IInt) )
-    , ( "transferFrom", Signature (ITuple3 ( IAddress, IAddress, IInt )) (ISingle IInt) )
+    , ( "transfer", Signature (ITuple2 ( IAddress, IInt )) (ISingle IBool) )
+    , ( "allowance", Signature (ITuple2 ( IAddress, IAddress )) (ISingle IBool) )
+    , ( "approve", Signature (ITuple2 ( IAddress, IInt )) (ISingle IBool) )
+    , ( "transferFrom", Signature (ITuple3 ( IAddress, IAddress, IInt )) (ISingle IBool) )
     , ( "name", Signature INone (ISingle IString) )
     , ( "symbol", Signature INone (ISingle IString) )
     , ( "decimals", Signature INone (ISingle IInt) )

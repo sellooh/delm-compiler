@@ -4,24 +4,25 @@ import Array exposing (Array)
 import Browser
 import Bytes exposing (..)
 import Bytes.Encode as BEnc
+import Concept.Core exposing (Address, Global, Requirements, throw)
+import Concept.Mapping as Mapping exposing (Mapping(..), empty)
 import Dict exposing (Dict)
 import Hex
 import Html exposing (Html, address, button, div, h1, h3, input, text)
-import Html.Attributes exposing (placeholder, type_, value)
-import Html.Events exposing (onClick, onInput)
+import Html.Attributes exposing (checked, placeholder, type_, value)
+import Html.Events exposing (onCheck, onClick, onInput)
 import Keccak.Bytes exposing (ethereum_keccak_256)
 import Random
 import String exposing (fromFloat, fromInt, toInt)
 import Task
 import Time
-import Concept.Core exposing (Address, Global, Requirements, throw)
-import Concept.Mapping as Mapping exposing (Mapping(..), empty)
 
 
 type Basic
     = RAddress Address
     | RString String
     | RInt Int
+    | RBool Bool
 
 
 type FunctionIO
@@ -35,6 +36,7 @@ type Interface
     = IAddress
     | IString
     | IInt
+    | IBool
 
 
 type InterfaceIO
@@ -501,6 +503,21 @@ singleToInput model key position interface =
             in
             input [ type_ "number", placeholder "Int", value val, onInput (\s -> SetForm key position (RInt (Maybe.withDefault 0 (toInt s)))) ] []
 
+        IBool ->
+            let
+                val =
+                    case valueBasic of
+                        Just (RBool v) ->
+                            v
+
+                        Nothing ->
+                            False
+
+                        _ ->
+                            throw "Strange value for field RInt."
+            in
+            input [ type_ "checkbox", placeholder "", checked val, onCheck (\b -> SetForm key position (RBool b)) ] []
+
 
 formParseSend : Model model -> String -> List (Html Msg)
 formParseSend model key =
@@ -538,6 +555,13 @@ formParseSend model key =
 
                 RInt i ->
                     fromInt i
+
+                RBool b ->
+                    if b then
+                        "True"
+
+                    else
+                        "False"
 
         returns =
             case Mapping.get key model.returns of
