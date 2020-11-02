@@ -1,5 +1,9 @@
 port module Concept.Contract exposing (..)
 
+-- import Html exposing (Html, address, button, div, h1, h3, input, text)
+-- import Html.Attributes exposing (checked, placeholder, type_, value)
+-- import Html.Events exposing (onCheck, onClick, onInput)
+
 import Array exposing (Array)
 import Browser
 import Bytes exposing (..)
@@ -7,10 +11,14 @@ import Bytes.Encode as BEnc
 import Concept.Core exposing (Address, Global, Requirements, throw)
 import Concept.Mapping as Mapping exposing (Mapping(..), empty)
 import Dict exposing (Dict)
+import Element exposing (..)
+import Element.Background as Background
+import Element.Border as Border
+import Element.Font as Font
+import Element.Input as Input
+import Element.Region as Region
 import Hex
-import Html exposing (Html, address, button, div, h1, h3, input, text)
-import Html.Attributes exposing (checked, placeholder, type_, value)
-import Html.Events exposing (onCheck, onClick, onInput)
+import Html exposing (Html)
 import Keccak.Bytes exposing (ethereum_keccak_256)
 import Random
 import String exposing (fromFloat, fromInt, toInt)
@@ -320,23 +328,56 @@ view contract model =
         ( _, constructorSignature ) =
             contract.constructor
     in
-    div []
-        [ h1 []
-            [ text "running..." ]
-        , div [] (viewAddresses model)
-        , div [] [ button [ onClick GenerateNewAddress ] [ text "new" ] ]
-        , div []
-            ([ h3 [] [ text "Constructor" ]
-             , constructorForm model
-                ( "constructor", constructorSignature )
-             ]
-                ++ formParseSend model "constructor"
-            )
-        , div [] (List.map (form model) signatures)
+    layout [] <|
+        row [ height fill, Element.width fill ]
+            [ panel contract model
+
+            -- , div []
+            --     ([ h3 [] [ text "Constructor" ]
+            --      ]
+            --         ++ formParseSend model "constructor"
+            --     )
+            -- , div [] (List.map (form model) signatures)
+            ]
+
+
+panel : Contract msg model -> Model model -> Element Msg
+panel contract model =
+    let
+        signatures =
+            contract.signatures
+
+        ( _, constructorSignature ) =
+            contract.constructor
+
+        filled =
+            Element.width fill
+    in
+    column
+        [ height fill
+        , Element.width <| fill
+        , Background.color <| Element.rgb255 165 139 244
+        , Font.color <| Element.rgb255 255 255 255
+        , spacing 10
+        , padding 30
+        ]
+        [ Element.text "running..."
+        , Input.button
+            [ Background.color (Element.rgb255 120 80 255)
+            , padding 10
+            ]
+            { onPress = Just GenerateNewAddress
+            , label =
+                text "new address"
+            }
+        , viewAddresses model
+        , constructorForm model ( "constructor", constructorSignature )
+        , formParseSend model "constructor"
+        , column [ filled, spacing 10 ] (List.map (form model) signatures)
         ]
 
 
-viewAddresses : Model model -> List (Html Msg)
+viewAddresses : Model model -> Element Msg
 viewAddresses model =
     let
         sender =
@@ -347,50 +388,63 @@ viewAddresses model =
                 Nothing ->
                     ""
     in
-    List.map
-        (\( k, v ) ->
-            div []
-                [ text
-                    (k
-                        ++ " | "
-                        ++ fromFloat v
-                        ++ "   "
-                    )
-                , if k /= sender then
-                    button [ onClick (SetDeployer k) ] [ text "set as sender" ]
+    Element.column [ Element.width fill ]
+        (List.map
+            (\( k, v ) ->
+                row [ Element.width fill ]
+                    [ -- if k /= sender then
+                      Input.button
+                        [ if k /= sender then
+                            Background.color (Element.rgb255 0 80 255)
 
-                  else
-                    button [] [ text "[current sender]" ]
-                ]
+                          else
+                            Background.color (Element.rgb255 138 238 138)
+                        ]
+                        { onPress =
+                            if k /= sender then
+                                Just (SetDeployer k)
+
+                            else
+                                Nothing
+                        , label = text "[ set as sender ]"
+                        }
+                    , el [ Element.width (fillPortion 6), Font.alignRight ] <|
+                        text k
+                    , el [ Element.width (fillPortion 4), Font.center ] <|
+                        text
+                            ("["
+                                ++ fromFloat v
+                                ++ " eth]"
+                            )
+                    ]
+            )
+            (Dict.toList model.addresses)
         )
-        (Dict.toList model.addresses)
 
 
-constructorForm : Model model -> ( String, Signature ) -> Html Msg
+constructorForm : Model model -> ( String, Signature ) -> Element Msg
 constructorForm model nameSignature =
     let
         fields =
             signatureToInput model nameSignature
     in
-    div []
-        [ input
-            [ type_ "number"
-            , placeholder "Value in wei"
-            , value
-                (if model.value > 0 then
+    column [ Element.width fill ]
+        [ Input.text [ Font.color (Element.rgb255 0 0 0) ]
+            { label = Input.labelLeft [] <| text "value"
+            , placeholder = Nothing
+            , text =
+                if model.value > 0 then
                     String.fromInt model.value
 
-                 else
-                    ""
-                )
-            , onInput (\s -> SetValue (Maybe.withDefault 0 (toInt s)))
-            ]
-            []
-        , fields
+                else
+                    "0"
+            , onChange = \s -> SetValue (Maybe.withDefault 0 (toInt s))
+            }
+        , el [ Element.width fill, padding 50 ] fields
         ]
 
 
-form : Model model -> ( String, Signature ) -> Html Msg
+form : Model model -> ( String, Signature ) -> Element Msg
 form model nameSignature =
     let
         ( name, _ ) =
@@ -398,19 +452,28 @@ form model nameSignature =
 
         fields =
             signatureToInput model nameSignature
+
+        filled =
+            Element.width fill
     in
     case Mapping.get "default" model.deploys of
         Just _ ->
-            div []
-                [ text name
-                , div [] ([ fields ] ++ formParseSend model name)
+            column
+                [ filled
+                , Border.width 1
+                , Border.rounded 3
+                , Border.color <| rgb255 200 200 200
+                , padding 20
+                ]
+                [ el [ Font.size 24, Font.bold ] <| text name
+                , column [ filled ] [ fields, formParseSend model name ]
                 ]
 
         Nothing ->
             text ""
 
 
-signatureToInput : Model model -> ( String, Signature ) -> Html Msg
+signatureToInput : Model model -> ( String, Signature ) -> Element Msg
 signatureToInput model nameSignature =
     let
         ( key, signature ) =
@@ -418,19 +481,23 @@ signatureToInput model nameSignature =
 
         singleToInputCurried =
             singleToInput model
+
+        filled =
+            Element.width fill
     in
     case signature.inputs of
         ISingle iBasic ->
-            singleToInputCurried key P1 iBasic
+            el [ filled ] <|
+                singleToInputCurried key P1 iBasic
 
         ITuple2 ( iBasic1, iBasic2 ) ->
-            div []
+            column [ filled ]
                 [ singleToInputCurried key P1 iBasic1
                 , singleToInputCurried key P2 iBasic2
                 ]
 
         ITuple3 ( iBasic1, iBasic2, iBasic3 ) ->
-            div []
+            column [ filled ]
                 [ singleToInputCurried key P1 iBasic1
                 , singleToInputCurried key P2 iBasic2
                 , singleToInputCurried key P3 iBasic3
@@ -440,7 +507,7 @@ signatureToInput model nameSignature =
             text ""
 
 
-singleToInput : Model model -> String -> Position -> Interface -> Html Msg
+singleToInput : Model model -> String -> Position -> Interface -> Element Msg
 singleToInput model key position interface =
     let
         ( v1, v2, v3 ) =
@@ -471,7 +538,12 @@ singleToInput model key position interface =
                         _ ->
                             throw "Strange value for field RAddress."
             in
-            input [ type_ "text", placeholder "Address", value val, onInput (\s -> SetForm key position (RAddress s)) ] []
+            Input.text [ Element.width fill, Font.color (Element.rgb255 0 0 0) ]
+                { label = Input.labelLeft [ Element.width fill ] <| text "Address"
+                , placeholder = Nothing
+                , text = val
+                , onChange = \s -> SetForm key position (RAddress s)
+                }
 
         IString ->
             let
@@ -486,7 +558,12 @@ singleToInput model key position interface =
                         _ ->
                             throw "Strange value for field RString."
             in
-            input [ type_ "text", placeholder "Text", value val, onInput (\s -> SetForm key position (RString s)) ] []
+            Input.text [ Element.width fill, Font.color (Element.rgb255 0 0 0) ]
+                { label = Input.labelLeft [ Element.width fill ] <| text "Text"
+                , placeholder = Nothing
+                , text = val
+                , onChange = \s -> SetForm key position (RString s)
+                }
 
         IInt ->
             let
@@ -501,7 +578,12 @@ singleToInput model key position interface =
                         _ ->
                             throw "Strange value for field RInt."
             in
-            input [ type_ "number", placeholder "Int", value val, onInput (\s -> SetForm key position (RInt (Maybe.withDefault 0 (toInt s)))) ] []
+            Input.text [ Element.width fill, Font.color (Element.rgb255 0 0 0) ]
+                { label = Input.labelLeft [ Element.width fill ] <| text "Int"
+                , placeholder = Nothing
+                , text = val
+                , onChange = \s -> SetForm key position (RInt (Maybe.withDefault 0 (toInt s)))
+                }
 
         IBool ->
             let
@@ -516,10 +598,15 @@ singleToInput model key position interface =
                         _ ->
                             throw "Strange value for field RInt."
             in
-            input [ type_ "checkbox", placeholder "", checked val, onCheck (\b -> SetForm key position (RBool b)) ] []
+            Input.checkbox [ Element.width fill ]
+                { label = Input.labelLeft [ Element.width fill ] <| text "Bool"
+                , checked = val
+                , icon = Input.defaultCheckbox
+                , onChange = \b -> SetForm key position (RBool b)
+                }
 
 
-formParseSend : Model model -> String -> List (Html Msg)
+formParseSend : Model model -> String -> Element Msg
 formParseSend model key =
     let
         formData =
@@ -580,27 +667,20 @@ formParseSend model key =
                 Nothing ->
                     ""
     in
-    [ button
-        [ if isConstructor then
-            onClick (DeployIntent (Deploy params))
+    if isConstructor then
+        Input.button [ alignRight, paddingEach { top = 0, right = 60, left = 0, bottom = 0 } ]
+            { onPress = Just (DeployIntent (Deploy params))
+            , label = text "Deploy"
+            }
 
-          else
-            onClick (ContractCallIntent (ContractCall key params))
-        ]
-        [ text
-            (if isConstructor then
-                "Deploy"
-
-             else
-                "Transact"
-            )
-        ]
-    , if isConstructor then
-        text ""
-
-      else
-        text returns
-    ]
+    else
+        column [ alignRight ]
+            [ Input.button [ paddingEach { top = 20, right = 0, left = 0, bottom = 0 } ]
+                { onPress = Just (ContractCallIntent (ContractCall key params))
+                , label = text "Transact"
+                }
+            , el [ paddingEach { top = 15, right = 0, left = 10, bottom = 0 } ] <| text returns
+            ]
 
 
 subscriptions : Model model -> Sub Msg
