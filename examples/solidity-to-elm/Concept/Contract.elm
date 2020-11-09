@@ -60,7 +60,7 @@ type Position
 
 
 type alias Contract msg model =
-    { constructor : ( Global -> FunctionIO -> model, Signature )
+    { constructor : ( Global -> FunctionIO -> model, InterfaceIO )
     , update : msg -> Global -> model -> ( Requirements, model, FunctionIO )
     , signatures : List ( String, Signature )
     , encodeMsg : ( String, FunctionIO ) -> msg
@@ -346,7 +346,7 @@ panel contract model =
         signatures =
             contract.signatures
 
-        ( _, constructorSignature ) =
+        ( _, constructorParams ) =
             contract.constructor
 
         filled =
@@ -370,7 +370,7 @@ panel contract model =
                 text "new address"
             }
         , viewAddresses model
-        , constructorForm model ( "constructor", constructorSignature )
+        , constructorForm model ( "constructor", Signature constructorParams INone )
         , formParseSend model "constructor"
         , column [ filled, spacing 10 ] (List.map (form model) signatures)
         ]

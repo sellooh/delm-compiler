@@ -10,7 +10,7 @@ import Dict exposing (Dict)
 main : Program () (ContractModule.Model Model) ContractModule.Msg
 main =
     initialize
-        (Contract ( constructor, Signature (ITuple3 ( IString, IString, IInt )) INone )
+        (Contract ( constructor, ITuple3 ( IString, IString, IInt ) )
             update
             signatures
             encodeMsg

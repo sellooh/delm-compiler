@@ -5261,15 +5261,10 @@ var $author$project$Concept$Contract$Contract = F4(
 		return {constructor: constructor, encodeMsg: encodeMsg, signatures: signatures, update: update};
 	});
 var $author$project$Concept$Contract$IInt = {$: 'IInt'};
-var $author$project$Concept$Contract$INone = {$: 'INone'};
 var $author$project$Concept$Contract$IString = {$: 'IString'};
 var $author$project$Concept$Contract$ITuple3 = function (a) {
 	return {$: 'ITuple3', a: a};
 };
-var $author$project$Concept$Contract$Signature = F2(
-	function (inputs, outputs) {
-		return {inputs: inputs, outputs: outputs};
-	});
 var $author$project$Concept$Mapping$Mapping = F2(
 	function (a, b) {
 		return {$: 'Mapping', a: a, b: b};
@@ -5401,12 +5396,13 @@ var $author$project$Concept$Mapping$insert = F3(
 		var internalDict = A3($elm$core$Dict$insert, comparable, value, dict);
 		return A2($author$project$Concept$Mapping$Mapping, internalDict, _default);
 	});
+var $author$project$Concept$DefaultValues$int = 0;
 var $elm$core$Debug$todo = _Debug_todo;
 var $author$project$Concept$Core$throw = _Debug_todo(
 	'Concept.Core',
 	{
-		start: {line: 26, column: 5},
-		end: {line: 26, column: 15}
+		start: {line: 23, column: 5},
+		end: {line: 23, column: 15}
 	});
 var $author$project$ERC20$ERC20$constructor = F2(
 	function (global, params) {
@@ -5426,12 +5422,12 @@ var $author$project$ERC20$ERC20$constructor = F2(
 		var totalSupply = _v0.c;
 		return {
 			allowances: $author$project$Concept$Mapping$empty(
-				$author$project$Concept$Mapping$empty(0)),
+				$author$project$Concept$Mapping$empty($author$project$Concept$DefaultValues$int)),
 			balances: A3(
 				$author$project$Concept$Mapping$insert,
 				global.msg.sender,
 				totalSupply,
-				$author$project$Concept$Mapping$empty(0)),
+				$author$project$Concept$Mapping$empty($author$project$Concept$DefaultValues$int)),
 			decimals: 2,
 			name: name,
 			symbol: symbol,
@@ -18157,6 +18153,11 @@ var $mdgriffith$elm_ui$Element$layoutWith = F3(
 var $mdgriffith$elm_ui$Element$layout = $mdgriffith$elm_ui$Element$layoutWith(
 	{options: _List_Nil});
 var $author$project$Concept$Contract$GenerateNewAddress = {$: 'GenerateNewAddress'};
+var $author$project$Concept$Contract$INone = {$: 'INone'};
+var $author$project$Concept$Contract$Signature = F2(
+	function (inputs, outputs) {
+		return {inputs: inputs, outputs: outputs};
+	});
 var $mdgriffith$elm_ui$Internal$Model$Button = {$: 'Button'};
 var $mdgriffith$elm_ui$Internal$Model$Describe = function (a) {
 	return {$: 'Describe', a: a};
@@ -20126,7 +20127,7 @@ var $author$project$Concept$Contract$panel = F2(
 		var signatures = contract.signatures;
 		var filled = $mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill);
 		var _v0 = contract.constructor;
-		var constructorSignature = _v0.b;
+		var constructorParams = _v0.b;
 		return A2(
 			$mdgriffith$elm_ui$Element$column,
 			_List_fromArray(
@@ -20159,7 +20160,9 @@ var $author$project$Concept$Contract$panel = F2(
 					A2(
 					$author$project$Concept$Contract$constructorForm,
 					model,
-					_Utils_Tuple2('constructor', constructorSignature)),
+					_Utils_Tuple2(
+						'constructor',
+						A2($author$project$Concept$Contract$Signature, constructorParams, $author$project$Concept$Contract$INone))),
 					A2($author$project$Concept$Contract$formParseSend, model, 'constructor'),
 					A2(
 					$mdgriffith$elm_ui$Element$column,
@@ -20430,11 +20433,8 @@ var $author$project$ERC20$ERC20$main = $author$project$Concept$Contract$initiali
 		$author$project$Concept$Contract$Contract,
 		_Utils_Tuple2(
 			$author$project$ERC20$ERC20$constructor,
-			A2(
-				$author$project$Concept$Contract$Signature,
-				$author$project$Concept$Contract$ITuple3(
-					_Utils_Tuple3($author$project$Concept$Contract$IString, $author$project$Concept$Contract$IString, $author$project$Concept$Contract$IInt)),
-				$author$project$Concept$Contract$INone)),
+			$author$project$Concept$Contract$ITuple3(
+				_Utils_Tuple3($author$project$Concept$Contract$IString, $author$project$Concept$Contract$IString, $author$project$Concept$Contract$IInt))),
 		$author$project$ERC20$ERC20$update,
 		$author$project$ERC20$ERC20$signatures,
 		$author$project$ERC20$ERC20$encodeMsg));
