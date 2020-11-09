@@ -2,6 +2,7 @@ module ERC20.ERC20 exposing (..)
 
 import Concept.Contract as ContractModule exposing (Basic(..), Contract, FunctionIO(..), Interface(..), InterfaceIO(..), Signature, initialize, subscriptions)
 import Concept.Core exposing (Address, Global, Requirements, defaultValues, throw, zeroAddress)
+import Concept.DefaultValues as Default
 import Concept.Mapping as Mapping exposing (Mapping(..))
 import Dict exposing (Dict)
 
@@ -41,8 +42,8 @@ constructor global params =
                 _ ->
                     throw "Invalid parameters"
     in
-    { balances = Mapping.insert global.msg.sender totalSupply (Mapping.empty 0)
-    , allowances = Mapping.empty (Mapping.empty 0)
+    { balances = Mapping.insert global.msg.sender totalSupply (Mapping.empty Default.int)
+    , allowances = Mapping.empty (Mapping.empty Default.int)
     , totalSupply = totalSupply
     , name = name
     , symbol = symbol
@@ -72,7 +73,7 @@ update msg global model =
             in
             ( []
             , model
-            , Single (RInt balance)
+            , Single <| RInt balance
             )
 
         Transfer address amount ->
@@ -96,7 +97,7 @@ update msg global model =
                         (recipientBalance + amount)
                         updatedBalance
               }
-            , Single (RBool True)
+            , Single <| RBool True
             )
 
         GetAllowance owner spender ->
@@ -123,7 +124,8 @@ update msg global model =
               , ( spender /= zeroAddress, "ERC20: transfer to the zero address" )
               ]
             , { model | allowances = allowances }
-            , Single (RBool True)
+            , Single <|
+                RBool True
             )
 
         TransferFrom sender recipient amount ->
@@ -160,20 +162,21 @@ update msg global model =
                         (recipientBalance + amount)
                         updatedBalance
               }
-            , Single (RBool True)
+            , Single <|
+                RBool True
             )
 
         GetName ->
-            ( [], model, Single (RString model.name) )
+            ( [], model, Single <| RString model.name )
 
         GetSymbol ->
-            ( [], model, Single (RString model.symbol) )
+            ( [], model, Single <| RString model.symbol )
 
         GetDecimals ->
-            ( [], model, Single (RInt model.decimals) )
+            ( [], model, Single <| RInt model.decimals )
 
         GetTotalSupply ->
-            ( [], model, Single (RInt model.totalSupply) )
+            ( [], model, Single <| RInt model.totalSupply )
 
 
 signatures : List ( String, Signature )

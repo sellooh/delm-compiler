@@ -1,7 +1,4 @@
-port module Concept.Core exposing (..)
-
-
-port sendMessage : String -> Cmd msg
+module Concept.Core exposing (..)
 
 
 type alias Requirements =
