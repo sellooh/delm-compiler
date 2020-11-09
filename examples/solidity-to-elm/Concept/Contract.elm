@@ -9,7 +9,6 @@ import Browser
 import Bytes exposing (..)
 import Bytes.Encode as BEnc
 import Concept.Core exposing (Address, Global, Requirements, throw)
-import Concept.Mapping as Mapping exposing (Mapping(..), empty)
 import Dict exposing (Dict)
 import Element exposing (..)
 import Element.Background as Background
@@ -69,9 +68,9 @@ type alias Contract msg model =
 
 
 type alias Model model =
-    { deploys : Mapping String model
-    , form : Mapping String ( Maybe Basic, Maybe Basic, Maybe Basic )
-    , returns : Mapping String FunctionIO
+    { deploys : Dict String model
+    , form : Dict String ( Maybe Basic, Maybe Basic, Maybe Basic )
+    , returns : Dict String FunctionIO
     , addresses : Dict Address Float
     , sender : Maybe Address
     , value : Int
@@ -111,9 +110,9 @@ initialize contract =
 
 init : Contract msg model -> () -> ( Model model, Cmd Msg )
 init contract _ =
-    ( { form = Mapping.empty
-      , deploys = Mapping.empty
-      , returns = Mapping.empty
+    ( { form = Dict.empty
+      , deploys = Dict.empty
+      , returns = Dict.empty
       , addresses =
             Dict.empty
       , sender = Nothing
@@ -220,7 +219,7 @@ update contract msg model =
                     contract.constructor
 
                 deploys =
-                    Mapping.insert "default" (constructor model.global params) model.deploys
+                    Dict.insert "default" (constructor model.global params) model.deploys
 
                 deployerAddress =
                     Maybe.withDefault "" model.sender
@@ -250,7 +249,7 @@ update contract msg model =
         ContractCall name params ->
             let
                 deploy =
-                    case Mapping.get "default" model.deploys of
+                    case Dict.get "default" model.deploys of
                         Just m ->
                             m
 
@@ -280,14 +279,14 @@ update contract msg model =
 
                 deploys =
                     if List.length errors == 0 then
-                        Mapping.insert "default" updatedModel model.deploys
+                        Dict.insert "default" updatedModel model.deploys
 
                     else
                         model.deploys
 
                 newReturns =
                     if List.length errors == 0 then
-                        Mapping.insert name
+                        Dict.insert name
                             returns
                             model.returns
 
@@ -300,7 +299,7 @@ update contract msg model =
             -- throw "not implemented yet."
             let
                 ( value1, value2, value3 ) =
-                    Maybe.withDefault ( Nothing, Nothing, Nothing ) (Mapping.get name model.form)
+                    Maybe.withDefault ( Nothing, Nothing, Nothing ) (Dict.get name model.form)
 
                 fields =
                     case position of
@@ -314,7 +313,7 @@ update contract msg model =
                             ( value1, value2, Just param )
 
                 updatedForm =
-                    Mapping.insert name fields model.form
+                    Dict.insert name fields model.form
             in
             ( { model | form = updatedForm }, Cmd.none )
 
@@ -456,7 +455,7 @@ form model nameSignature =
         filled =
             Element.width fill
     in
-    case Mapping.get "default" model.deploys of
+    case Dict.get "default" model.deploys of
         Just _ ->
             column
                 [ filled
@@ -511,7 +510,7 @@ singleToInput : Model model -> String -> Position -> Interface -> Element Msg
 singleToInput model key position interface =
     let
         ( v1, v2, v3 ) =
-            Maybe.withDefault ( Nothing, Nothing, Nothing ) (Mapping.get key model.form)
+            Maybe.withDefault ( Nothing, Nothing, Nothing ) (Dict.get key model.form)
 
         valueBasic =
             case position of
@@ -610,7 +609,7 @@ formParseSend : Model model -> String -> Element Msg
 formParseSend model key =
     let
         formData =
-            Maybe.withDefault ( Nothing, Nothing, Nothing ) (Mapping.get key model.form)
+            Maybe.withDefault ( Nothing, Nothing, Nothing ) (Dict.get key model.form)
 
         isConstructor =
             key == "constructor"
@@ -651,7 +650,7 @@ formParseSend model key =
                         "False"
 
         returns =
-            case Mapping.get key model.returns of
+            case Dict.get key model.returns of
                 Just None ->
                     ""
 

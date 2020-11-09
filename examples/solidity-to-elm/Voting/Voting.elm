@@ -1,9 +1,9 @@
 module Voting.Voting exposing (..)
 
-import Dict exposing (Dict)
 import Concept.Contract as ContractModule exposing (Basic(..), Contract, FunctionIO(..), Interface(..), InterfaceIO(..), Signature, initialize, subscriptions)
 import Concept.Core exposing (Address, Global, Requirements, defaultValues, throw, zeroAddress)
 import Concept.Mapping as Mapping exposing (Mapping(..))
+import Dict exposing (Dict)
 
 
 main : Program () (ContractModule.Model Model) ContractModule.Msg
@@ -54,7 +54,7 @@ constructor global proposals =
     in
     { chairperson = global.msg.sender
     , voters =
-        Mapping.singleton global.msg.sender (Voter 1 False Nothing Nothing)
+        Mapping.singleton global.msg.sender (Voter 1 False Nothing Nothing) (Voter 1 False Nothing Nothing)
     , proposals = List.map (\proposal -> Proposal proposal 0) [ p1, p2 ]
     }
 
@@ -76,16 +76,7 @@ update msg global model =
                     Mapping.insert address (Voter 1 False Nothing Nothing) model.voters
 
                 hasVoted =
-                    let
-                        maybeVoter =
-                            Mapping.get address model.voters
-                    in
-                    case maybeVoter of
-                        Just voter ->
-                            voter.voted
-
-                        Nothing ->
-                            False
+                    .voted (Mapping.get address model.voters)
             in
             ( [ ( global.msg.sender == model.chairperson, "Only chairperson can give right to vote." )
               , ( not hasVoted, "The voter already voted." )
@@ -101,43 +92,31 @@ update msg global model =
 
                 ( hasVoted, voter ) =
                     let
-                        maybeVoter =
+                        v =
                             Mapping.get global.msg.sender model.voters
                     in
-                    case maybeVoter of
-                        Just v ->
-                            let
-                                updatedVoter =
-                                    { v | voted = True, delegate = Just delegateAddress }
-                            in
-                            ( v.voted, updatedVoter )
-
-                        Nothing ->
-                            -- throw "Sender address isn't a voter."
-                            ( False, defaultValues (Voter 0 False Nothing Nothing) )
+                    let
+                        updatedVoter =
+                            { v | voted = True, delegate = Just delegateAddress }
+                    in
+                    ( v.voted, updatedVoter )
 
                 delegate =
                     let
-                        maybeDelegate =
+                        d =
                             Mapping.get delegateAddress model.voters
                     in
-                    case maybeDelegate of
-                        Just d ->
-                            let
-                                weight =
-                                    if not d.voted then
-                                        d.weight + voter.weight
+                    let
+                        weight =
+                            if not d.voted then
+                                d.weight + voter.weight
 
-                                    else
-                                        d.weight
-                            in
-                            { d | weight = weight }
+                            else
+                                d.weight
+                    in
+                    { d | weight = weight }
 
-                        -- Voter weight True (Just address) Nothing
-                        Nothing ->
-                            -- throw "Delegated address isn't a voter."
-                            defaultValues (Voter 0 False Nothing Nothing)
-
+                -- Voter weight True (Just address) Nothing
                 -- Voter 1 False Nothing Nothing
                 proposals =
                     if delegate.voted then
@@ -183,20 +162,13 @@ update msg global model =
             let
                 ( hasVoted, voter ) =
                     let
-                        maybeVoter =
+                        v =
                             Mapping.get global.msg.sender model.voters
-                    in
-                    case maybeVoter of
-                        Just v ->
-                            let
-                                updatedVoter =
-                                    { v | voted = True, vote = Just vote }
-                            in
-                            ( v.voted, updatedVoter )
 
-                        Nothing ->
-                            -- throw "Sender address isn't a voter."
-                            ( False, defaultValues (Voter 0 False Nothing Nothing) )
+                        updatedVoter =
+                            { v | voted = True, vote = Just vote }
+                    in
+                    ( v.voted, updatedVoter )
 
                 proposals =
                     List.indexedMap
@@ -247,21 +219,16 @@ findDelegate sender voters to =
 
         delegate =
             let
-                maybeDelegate =
+                d =
                     Mapping.get to voters
             in
-            case maybeDelegate of
-                Just d ->
-                    case d.delegate of
-                        Just address ->
-                            findDelegate sender voters address
-
-                        Nothing ->
-                            to
+            -- how to handle maybes?
+            case d.delegate of
+                Just address ->
+                    findDelegate sender voters address
 
                 Nothing ->
-                    -- throw "Delegated address isn't a voter."
-                    defaultValues zeroAddress
+                    to
     in
     delegate
 

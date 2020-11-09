@@ -5270,18 +5270,16 @@ var $author$project$Concept$Contract$Signature = F2(
 	function (inputs, outputs) {
 		return {inputs: inputs, outputs: outputs};
 	});
-var $elm$core$Basics$identity = function (x) {
-	return x;
-};
-var $author$project$Concept$Mapping$Mapping = function (a) {
-	return {$: 'Mapping', a: a};
-};
+var $author$project$Concept$Mapping$Mapping = F2(
+	function (a, b) {
+		return {$: 'Mapping', a: a, b: b};
+	});
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
-var $author$project$Concept$Mapping$empty = function () {
+var $author$project$Concept$Mapping$empty = function (_default) {
 	var dict = $elm$core$Dict$empty;
-	return $author$project$Concept$Mapping$Mapping(dict);
-}();
+	return A2($author$project$Concept$Mapping$Mapping, dict, _default);
+};
 var $elm$core$Dict$Black = {$: 'Black'};
 var $elm$core$Dict$RBNode_elm_builtin = F5(
 	function (a, b, c, d, e) {
@@ -5393,12 +5391,15 @@ var $elm$core$Dict$insert = F3(
 	});
 var $author$project$Concept$Mapping$insert = F3(
 	function (comparable, value, mapping) {
-		var dict = function () {
+		var _v0 = function () {
 			var d = mapping.a;
-			return d;
+			var v = mapping.b;
+			return _Utils_Tuple2(d, v);
 		}();
+		var dict = _v0.a;
+		var _default = _v0.b;
 		var internalDict = A3($elm$core$Dict$insert, comparable, value, dict);
-		return $author$project$Concept$Mapping$Mapping(internalDict);
+		return A2($author$project$Concept$Mapping$Mapping, internalDict, _default);
 	});
 var $elm$core$Debug$todo = _Debug_todo;
 var $author$project$Concept$Core$throw = _Debug_todo(
@@ -5424,8 +5425,13 @@ var $author$project$ERC20$ERC20$constructor = F2(
 		var symbol = _v0.b;
 		var totalSupply = _v0.c;
 		return {
-			allowances: $author$project$Concept$Mapping$empty,
-			balances: A3($author$project$Concept$Mapping$insert, global.msg.sender, totalSupply, $author$project$Concept$Mapping$empty),
+			allowances: $author$project$Concept$Mapping$empty(
+				$author$project$Concept$Mapping$empty(0)),
+			balances: A3(
+				$author$project$Concept$Mapping$insert,
+				global.msg.sender,
+				totalSupply,
+				$author$project$Concept$Mapping$empty(0)),
 			decimals: 2,
 			name: name,
 			symbol: symbol,
@@ -9522,6 +9528,9 @@ var $elm$browser$Debugger$Metadata$encode = function (_v0) {
 				$elm$browser$Debugger$Metadata$encodeTypes(types))
 			]));
 };
+var $elm$core$Basics$identity = function (x) {
+	return x;
+};
 var $elm$core$Task$Perform = function (a) {
 	return {$: 'Perform', a: a};
 };
@@ -11110,13 +11119,13 @@ var $author$project$Concept$Contract$init = F2(
 		return _Utils_Tuple2(
 			{
 				addresses: $elm$core$Dict$empty,
-				deploys: $author$project$Concept$Mapping$empty,
-				form: $author$project$Concept$Mapping$empty,
+				deploys: $elm$core$Dict$empty,
+				form: $elm$core$Dict$empty,
 				global: {
 					block: {coinbase: '', difficulty: 0, gasLimit: 0, number: 0, timestamp: 0},
 					msg: {data: '', sender: '', sig: '', value: 0}
 				},
-				returns: $author$project$Concept$Mapping$empty,
+				returns: $elm$core$Dict$empty,
 				sender: $elm$core$Maybe$Nothing,
 				value: 0
 			},
@@ -12302,15 +12311,6 @@ var $author$project$Concept$Contract$generateGlobal = F2(
 			A2($elm$random$Random$int, 0, 100),
 			A2($elm$random$Random$int, 0, $elm$random$Random$maxInt));
 	});
-var $author$project$Concept$Mapping$get = F2(
-	function (comparable, mapping) {
-		var dict = function () {
-			var d = mapping.a;
-			return d;
-		}();
-		var value = A2($elm$core$Dict$get, comparable, dict);
-		return value;
-	});
 var $elm$core$Debug$log = _Debug_log;
 var $author$project$Concept$Contract$update = F3(
 	function (contract, msg, model) {
@@ -12416,7 +12416,7 @@ var $author$project$Concept$Contract$update = F3(
 				var _v2 = contract.constructor;
 				var constructor = _v2.a;
 				var deploys = A3(
-					$author$project$Concept$Mapping$insert,
+					$elm$core$Dict$insert,
 					'default',
 					A2(constructor, model.global, params),
 					model.deploys);
@@ -12442,7 +12442,7 @@ var $author$project$Concept$Contract$update = F3(
 				var name = msg.a;
 				var params = msg.b;
 				var deploy = function () {
-					var _v7 = A2($author$project$Concept$Mapping$get, 'default', model.deploys);
+					var _v7 = A2($elm$core$Dict$get, 'default', model.deploys);
 					if (_v7.$ === 'Just') {
 						var m = _v7.a;
 						return m;
@@ -12467,8 +12467,8 @@ var $author$project$Concept$Contract$update = F3(
 						return ok ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(error);
 					},
 					requirements);
-				var newReturns = (!$elm$core$List$length(errors)) ? A3($author$project$Concept$Mapping$insert, name, returns, model.returns) : model.returns;
-				var deploys = (!$elm$core$List$length(errors)) ? A3($author$project$Concept$Mapping$insert, 'default', updatedModel, model.deploys) : model.deploys;
+				var newReturns = (!$elm$core$List$length(errors)) ? A3($elm$core$Dict$insert, name, returns, model.returns) : model.returns;
+				var deploys = (!$elm$core$List$length(errors)) ? A3($elm$core$Dict$insert, 'default', updatedModel, model.deploys) : model.deploys;
 				var _v5 = (!$elm$core$List$length(errors)) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
 					A2(
 						$elm$core$Debug$log,
@@ -12486,7 +12486,7 @@ var $author$project$Concept$Contract$update = F3(
 				var _v8 = A2(
 					$elm$core$Maybe$withDefault,
 					_Utils_Tuple3($elm$core$Maybe$Nothing, $elm$core$Maybe$Nothing, $elm$core$Maybe$Nothing),
-					A2($author$project$Concept$Mapping$get, name, model.form));
+					A2($elm$core$Dict$get, name, model.form));
 				var value1 = _v8.a;
 				var value2 = _v8.b;
 				var value3 = _v8.c;
@@ -12509,7 +12509,7 @@ var $author$project$Concept$Contract$update = F3(
 								$elm$core$Maybe$Just(param));
 					}
 				}();
-				var updatedForm = A3($author$project$Concept$Mapping$insert, name, fields, model.form);
+				var updatedForm = A3($elm$core$Dict$insert, name, fields, model.form);
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -19565,7 +19565,7 @@ var $author$project$Concept$Contract$singleToInput = F4(
 		var _v0 = A2(
 			$elm$core$Maybe$withDefault,
 			_Utils_Tuple3($elm$core$Maybe$Nothing, $elm$core$Maybe$Nothing, $elm$core$Maybe$Nothing),
-			A2($author$project$Concept$Mapping$get, key, model.form));
+			A2($elm$core$Dict$get, key, model.form));
 		var v1 = _v0.a;
 		var v2 = _v0.b;
 		var v3 = _v0.c;
@@ -19877,7 +19877,7 @@ var $author$project$Concept$Contract$formParseSend = F2(
 			}
 		};
 		var returns = function () {
-			var _v7 = A2($author$project$Concept$Mapping$get, key, model.returns);
+			var _v7 = A2($elm$core$Dict$get, key, model.returns);
 			if (_v7.$ === 'Just') {
 				switch (_v7.a.$) {
 					case 'None':
@@ -19906,7 +19906,7 @@ var $author$project$Concept$Contract$formParseSend = F2(
 		var formData = A2(
 			$elm$core$Maybe$withDefault,
 			_Utils_Tuple3($elm$core$Maybe$Nothing, $elm$core$Maybe$Nothing, $elm$core$Maybe$Nothing),
-			A2($author$project$Concept$Mapping$get, key, model.form));
+			A2($elm$core$Dict$get, key, model.form));
 		var params = function () {
 			_v0$4:
 			while (true) {
@@ -19996,7 +19996,7 @@ var $author$project$Concept$Contract$form = F2(
 		var fields = A2($author$project$Concept$Contract$signatureToInput, model, nameSignature);
 		var _v0 = nameSignature;
 		var name = _v0.a;
-		var _v1 = A2($author$project$Concept$Mapping$get, 'default', model.deploys);
+		var _v1 = A2($elm$core$Dict$get, 'default', model.deploys);
 		if (_v1.$ === 'Just') {
 			return A2(
 				$mdgriffith$elm_ui$Element$column,
@@ -20272,24 +20272,30 @@ var $author$project$ERC20$ERC20$signatures = _List_fromArray(
 			$author$project$Concept$Contract$INone,
 			$author$project$Concept$Contract$ISingle($author$project$Concept$Contract$IInt)))
 	]);
-var $author$project$Concept$Core$defaultValues = function (a) {
-	return a;
-};
+var $author$project$Concept$Mapping$get = F2(
+	function (comparable, mapping) {
+		var _v0 = function () {
+			var d = mapping.a;
+			var v = mapping.b;
+			return _Utils_Tuple2(d, v);
+		}();
+		var dict = _v0.a;
+		var _default = _v0.b;
+		var value = A2($elm$core$Dict$get, comparable, dict);
+		if (value.$ === 'Just') {
+			var v = value.a;
+			return v;
+		} else {
+			return _default;
+		}
+	});
 var $author$project$Concept$Core$zeroAddress = '0x0000000000000000000000000000000000000000';
 var $author$project$ERC20$ERC20$update = F3(
 	function (msg, global, model) {
 		switch (msg.$) {
 			case 'BalanceOf':
 				var address = msg.a;
-				var balance = function () {
-					var owner = A2($author$project$Concept$Mapping$get, address, model.balances);
-					if (owner.$ === 'Just') {
-						var o = owner.a;
-						return o;
-					} else {
-						return $author$project$Concept$Core$defaultValues(0);
-					}
-				}();
+				var balance = A2($author$project$Concept$Mapping$get, address, model.balances);
 				return _Utils_Tuple3(
 					_List_Nil,
 					model,
@@ -20298,25 +20304,9 @@ var $author$project$ERC20$ERC20$update = F3(
 			case 'Transfer':
 				var address = msg.a;
 				var amount = msg.b;
-				var senderBalance = function () {
-					var owner = A2($author$project$Concept$Mapping$get, global.msg.sender, model.balances);
-					if (owner.$ === 'Just') {
-						var balance = owner.a;
-						return balance;
-					} else {
-						return $author$project$Concept$Core$defaultValues(0);
-					}
-				}();
+				var senderBalance = A2($author$project$Concept$Mapping$get, global.msg.sender, model.balances);
 				var updatedBalance = A3($author$project$Concept$Mapping$insert, global.msg.sender, senderBalance - amount, model.balances);
-				var recipientBalance = function () {
-					var owner = A2($author$project$Concept$Mapping$get, address, updatedBalance);
-					if (owner.$ === 'Just') {
-						var balance = owner.a;
-						return balance;
-					} else {
-						return $author$project$Concept$Core$defaultValues(0);
-					}
-				}();
+				var recipientBalance = A2($author$project$Concept$Mapping$get, address, updatedBalance);
 				return _Utils_Tuple3(
 					_List_fromArray(
 						[
@@ -20340,24 +20330,8 @@ var $author$project$ERC20$ERC20$update = F3(
 			case 'GetAllowance':
 				var owner = msg.a;
 				var spender = msg.b;
-				var allowancesMapping = function () {
-					var o = A2($author$project$Concept$Mapping$get, owner, model.allowances);
-					if (o.$ === 'Just') {
-						var mapping = o.a;
-						return mapping;
-					} else {
-						return $author$project$Concept$Core$defaultValues($author$project$Concept$Mapping$empty);
-					}
-				}();
-				var allowedBalance = function () {
-					var a = A2($author$project$Concept$Mapping$get, spender, allowancesMapping);
-					if (a.$ === 'Just') {
-						var balance = a.a;
-						return balance;
-					} else {
-						return $author$project$Concept$Core$defaultValues(0);
-					}
-				}();
+				var allowancesMapping = A2($author$project$Concept$Mapping$get, owner, model.allowances);
+				var allowedBalance = A2($author$project$Concept$Mapping$get, spender, allowancesMapping);
 				return _Utils_Tuple3(
 					_List_Nil,
 					model,
@@ -20366,15 +20340,7 @@ var $author$project$ERC20$ERC20$update = F3(
 			case 'Approve':
 				var spender = msg.a;
 				var amount = msg.b;
-				var allowancesMapping = function () {
-					var o = A2($author$project$Concept$Mapping$get, global.msg.sender, model.allowances);
-					if (o.$ === 'Just') {
-						var mapping = o.a;
-						return mapping;
-					} else {
-						return $author$project$Concept$Core$defaultValues($author$project$Concept$Mapping$empty);
-					}
-				}();
+				var allowancesMapping = A2($author$project$Concept$Mapping$get, global.msg.sender, model.allowances);
 				var allowances = A3(
 					$author$project$Concept$Mapping$insert,
 					global.msg.sender,
@@ -20399,43 +20365,11 @@ var $author$project$ERC20$ERC20$update = F3(
 				var sender = msg.a;
 				var recipient = msg.b;
 				var amount = msg.c;
-				var senderBalance = function () {
-					var owner = A2($author$project$Concept$Mapping$get, sender, model.balances);
-					if (owner.$ === 'Just') {
-						var balance = owner.a;
-						return balance;
-					} else {
-						return $author$project$Concept$Core$defaultValues(0);
-					}
-				}();
+				var senderBalance = A2($author$project$Concept$Mapping$get, sender, model.balances);
 				var updatedBalance = A3($author$project$Concept$Mapping$insert, sender, senderBalance - amount, model.balances);
-				var recipientBalance = function () {
-					var owner = A2($author$project$Concept$Mapping$get, recipient, updatedBalance);
-					if (owner.$ === 'Just') {
-						var balance = owner.a;
-						return balance;
-					} else {
-						return $author$project$Concept$Core$defaultValues(0);
-					}
-				}();
-				var allowancesMapping = function () {
-					var o = A2($author$project$Concept$Mapping$get, sender, model.allowances);
-					if (o.$ === 'Just') {
-						var mapping = o.a;
-						return mapping;
-					} else {
-						return $author$project$Concept$Core$defaultValues($author$project$Concept$Mapping$empty);
-					}
-				}();
-				var allowedBalance = function () {
-					var a = A2($author$project$Concept$Mapping$get, global.msg.sender, allowancesMapping);
-					if (a.$ === 'Just') {
-						var balance = a.a;
-						return balance;
-					} else {
-						return $author$project$Concept$Core$defaultValues(0);
-					}
-				}();
+				var recipientBalance = A2($author$project$Concept$Mapping$get, recipient, updatedBalance);
+				var allowancesMapping = A2($author$project$Concept$Mapping$get, sender, model.allowances);
+				var allowedBalance = A2($author$project$Concept$Mapping$get, global.msg.sender, allowancesMapping);
 				var allowances = A3(
 					$author$project$Concept$Mapping$insert,
 					sender,

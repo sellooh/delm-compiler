@@ -41,8 +41,8 @@ constructor global params =
                 _ ->
                     throw "Invalid parameters"
     in
-    { balances = Mapping.insert global.msg.sender totalSupply Mapping.empty
-    , allowances = Mapping.empty
+    { balances = Mapping.insert global.msg.sender totalSupply (Mapping.empty 0)
+    , allowances = Mapping.empty (Mapping.empty 0)
     , totalSupply = totalSupply
     , name = name
     , symbol = symbol
@@ -68,16 +68,7 @@ update msg global model =
         BalanceOf address ->
             let
                 balance =
-                    let
-                        owner =
-                            Mapping.get address model.balances
-                    in
-                    case owner of
-                        Just o ->
-                            o
-
-                        Nothing ->
-                            defaultValues 0
+                    Mapping.get address model.balances
             in
             ( []
             , model
@@ -87,31 +78,13 @@ update msg global model =
         Transfer address amount ->
             let
                 senderBalance =
-                    let
-                        owner =
-                            Mapping.get global.msg.sender model.balances
-                    in
-                    case owner of
-                        Just balance ->
-                            balance
-
-                        Nothing ->
-                            defaultValues 0
+                    Mapping.get global.msg.sender model.balances
 
                 updatedBalance =
                     Mapping.insert global.msg.sender (senderBalance - amount) model.balances
 
                 recipientBalance =
-                    let
-                        owner =
-                            Mapping.get address updatedBalance
-                    in
-                    case owner of
-                        Just balance ->
-                            balance
-
-                        Nothing ->
-                            defaultValues 0
+                    Mapping.get address updatedBalance
             in
             ( [ ( global.msg.sender /= zeroAddress, "ERC20: transfer from the zero address" )
               , ( address /= zeroAddress, "ERC20: transfer to the zero address" )
@@ -129,44 +102,17 @@ update msg global model =
         GetAllowance owner spender ->
             let
                 allowancesMapping =
-                    let
-                        o =
-                            Mapping.get owner model.allowances
-                    in
-                    case o of
-                        Just mapping ->
-                            mapping
-
-                        Nothing ->
-                            defaultValues Mapping.empty
+                    Mapping.get owner model.allowances
 
                 allowedBalance =
-                    let
-                        a =
-                            Mapping.get spender allowancesMapping
-                    in
-                    case a of
-                        Just balance ->
-                            balance
-
-                        Nothing ->
-                            defaultValues 0
+                    Mapping.get spender allowancesMapping
             in
             ( [], model, Single (RInt allowedBalance) )
 
         Approve spender amount ->
             let
                 allowancesMapping =
-                    let
-                        o =
-                            Mapping.get global.msg.sender model.allowances
-                    in
-                    case o of
-                        Just mapping ->
-                            mapping
-
-                        Nothing ->
-                            defaultValues Mapping.empty
+                    Mapping.get global.msg.sender model.allowances
 
                 allowances =
                     Mapping.insert global.msg.sender
@@ -183,55 +129,19 @@ update msg global model =
         TransferFrom sender recipient amount ->
             let
                 senderBalance =
-                    let
-                        owner =
-                            Mapping.get sender model.balances
-                    in
-                    case owner of
-                        Just balance ->
-                            balance
-
-                        Nothing ->
-                            defaultValues 0
+                    Mapping.get sender model.balances
 
                 updatedBalance =
                     Mapping.insert sender (senderBalance - amount) model.balances
 
                 recipientBalance =
-                    let
-                        owner =
-                            Mapping.get recipient updatedBalance
-                    in
-                    case owner of
-                        Just balance ->
-                            balance
-
-                        Nothing ->
-                            defaultValues 0
+                    Mapping.get recipient updatedBalance
 
                 allowancesMapping =
-                    let
-                        o =
-                            Mapping.get sender model.allowances
-                    in
-                    case o of
-                        Just mapping ->
-                            mapping
-
-                        Nothing ->
-                            defaultValues Mapping.empty
+                    Mapping.get sender model.allowances
 
                 allowedBalance =
-                    let
-                        a =
-                            Mapping.get global.msg.sender allowancesMapping
-                    in
-                    case a of
-                        Just balance ->
-                            balance
-
-                        Nothing ->
-                            defaultValues 0
+                    Mapping.get global.msg.sender allowancesMapping
 
                 allowances =
                     Mapping.insert sender
