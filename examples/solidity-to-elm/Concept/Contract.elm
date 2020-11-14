@@ -62,6 +62,12 @@ type Position
 type alias Contract msg model =
     { constructor : ( Global -> FunctionIO -> model, InterfaceIO )
     , update : msg -> Global -> model -> ( Requirements, model, FunctionIO )
+    }
+
+
+type alias ContractCore msg model =
+    { constructor : ( Global -> FunctionIO -> model, InterfaceIO )
+    , update : msg -> Global -> model -> ( Requirements, model, FunctionIO )
     , signatures : List ( String, Signature )
     , encodeMsg : ( String, FunctionIO ) -> msg
     }
@@ -98,8 +104,13 @@ type Msg
     | SetForm String Position Basic
 
 
-initialize : Contract msg model -> Program () (Model model) Msg
-initialize contract =
+deploy : Contract msg model -> Program () model msg
+deploy contract =
+    throw "Please, don't run this directly."
+
+
+interpret : ContractCore msg model -> Program () (Model model) Msg
+interpret contract =
     Browser.element
         { init = init contract
         , view = view contract
@@ -108,7 +119,7 @@ initialize contract =
         }
 
 
-init : Contract msg model -> () -> ( Model model, Cmd Msg )
+init : ContractCore msg model -> () -> ( Model model, Cmd Msg )
 init contract _ =
     ( { form = Dict.empty
       , deploys = Dict.empty
@@ -160,7 +171,7 @@ generateGlobal model timestamp =
         (Random.int 0 Random.maxInt)
 
 
-update : Contract msg model -> Msg -> Model model -> ( Model model, Cmd Msg )
+update : ContractCore msg model -> Msg -> Model model -> ( Model model, Cmd Msg )
 update contract msg model =
     case msg of
         GenerateGlobal msgIntent timestamp ->
@@ -248,7 +259,7 @@ update contract msg model =
 
         ContractCall name params ->
             let
-                deploy =
+                currentDeploy =
                     case Dict.get "default" model.deploys of
                         Just m ->
                             m
@@ -257,7 +268,7 @@ update contract msg model =
                             throw "Contract not deployed."
 
                 ( requirements, updatedModel, returns ) =
-                    contract.update (contract.encodeMsg ( name, params )) model.global deploy
+                    contract.update (contract.encodeMsg ( name, params )) model.global currentDeploy
 
                 errors =
                     List.filterMap
@@ -318,7 +329,7 @@ update contract msg model =
             ( { model | form = updatedForm }, Cmd.none )
 
 
-view : Contract msg model -> Model model -> Html Msg
+view : ContractCore msg model -> Model model -> Html Msg
 view contract model =
     let
         signatures =
@@ -340,7 +351,7 @@ view contract model =
             ]
 
 
-panel : Contract msg model -> Model model -> Element Msg
+panel : ContractCore msg model -> Model model -> Element Msg
 panel contract model =
     let
         signatures =

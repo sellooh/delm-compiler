@@ -1,19 +1,15 @@
 module Voting.Voting exposing (..)
 
-import Concept.Contract as ContractModule exposing (Basic(..), Contract, FunctionIO(..), Interface(..), InterfaceIO(..), Signature, initialize, subscriptions)
-import Concept.Core exposing (Address, Global, Requirements, defaultValues, throw, zeroAddress)
+import Concept.Contract as ContractModule exposing (Basic(..), Contract, FunctionIO(..), Interface(..), InterfaceIO(..), Signature, deploy, subscriptions)
+import Concept.Core exposing (Address, Global, Requirements, throw, zeroAddress)
 import Concept.Mapping as Mapping exposing (Mapping(..))
-import Dict exposing (Dict)
 
 
-main : Program () (ContractModule.Model Model) ContractModule.Msg
+main : Program () Model Msg
 main =
-    initialize
-        (Contract ( constructor, ITuple2 ( IString, IString ) )
+    deploy <|
+        Contract ( constructor, ITuple2 ( IString, IString ) )
             update
-            signatures
-            encodeMsg
-        )
 
 
 

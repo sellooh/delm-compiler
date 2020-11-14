@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>ERC20.ERC20</title>
+  <title>ERC20.IERC20</title>
   <style>body { padding: 0; margin: 0; }</style>
 </head>
 
@@ -5256,7 +5256,7 @@ var $elm$core$Set$toList = function (_v0) {
 	return $elm$core$Dict$keys(dict);
 };
 var $elm$core$Basics$GT = {$: 'GT'};
-var $author$project$Concept$Contract$Contract = F4(
+var $author$project$Concept$Contract$ContractCore = F4(
 	function (constructor, update, signatures, encodeMsg) {
 		return {constructor: constructor, encodeMsg: encodeMsg, signatures: signatures, update: update};
 	});
@@ -5265,6 +5265,10 @@ var $author$project$Concept$Contract$IString = {$: 'IString'};
 var $author$project$Concept$Contract$ITuple3 = function (a) {
 	return {$: 'ITuple3', a: a};
 };
+var $elm$core$Basics$apL = F2(
+	function (f, x) {
+		return f(x);
+	});
 var $author$project$Concept$Mapping$Mapping = F2(
 	function (a, b) {
 		return {$: 'Mapping', a: a, b: b};
@@ -5457,7 +5461,7 @@ var $author$project$ERC20$ERC20$TransferFrom = F3(
 	function (a, b, c) {
 		return {$: 'TransferFrom', a: a, b: b, c: c};
 	});
-var $author$project$ERC20$ERC20$encodeMsg = function (toEncode) {
+var $author$project$ERC20$IERC20$encodeMsg = function (toEncode) {
 	_v0$9:
 	while (true) {
 		switch (toEncode.b.$) {
@@ -5793,10 +5797,6 @@ var $elm$core$Elm$JsArray$initialize = _JsArray_initialize;
 var $elm$core$Array$Leaf = function (a) {
 	return {$: 'Leaf', a: a};
 };
-var $elm$core$Basics$apL = F2(
-	function (f, x) {
-		return f(x);
-	});
 var $elm$core$Basics$apR = F2(
 	function (x, f) {
 		return f(x);
@@ -12437,7 +12437,7 @@ var $author$project$Concept$Contract$update = F3(
 			case 'ContractCall':
 				var name = msg.a;
 				var params = msg.b;
-				var deploy = function () {
+				var currentDeploy = function () {
 					var _v7 = A2($elm$core$Dict$get, 'default', model.deploys);
 					if (_v7.$ === 'Just') {
 						var m = _v7.a;
@@ -12451,7 +12451,7 @@ var $author$project$Concept$Contract$update = F3(
 					contract.encodeMsg(
 						_Utils_Tuple2(name, params)),
 					model.global,
-					deploy);
+					currentDeploy);
 				var requirements = _v4.a;
 				var updatedModel = _v4.b;
 				var returns = _v4.c;
@@ -20197,7 +20197,7 @@ var $author$project$Concept$Contract$view = F2(
 						A2($author$project$Concept$Contract$panel, contract, model)
 					])));
 	});
-var $author$project$Concept$Contract$initialize = function (contract) {
+var $author$project$Concept$Contract$interpret = function (contract) {
 	return $elm$browser$Browser$element(
 		{
 			init: $author$project$Concept$Contract$init(contract),
@@ -20214,7 +20214,7 @@ var $author$project$Concept$Contract$ISingle = function (a) {
 var $author$project$Concept$Contract$ITuple2 = function (a) {
 	return {$: 'ITuple2', a: a};
 };
-var $author$project$ERC20$ERC20$signatures = _List_fromArray(
+var $author$project$ERC20$IERC20$signatures = _List_fromArray(
 	[
 		_Utils_Tuple2(
 		'balanceOf',
@@ -20308,8 +20308,8 @@ var $author$project$ERC20$ERC20$update = F3(
 				var address = msg.a;
 				var amount = msg.b;
 				var senderBalance = A2($author$project$Concept$Mapping$get, global.msg.sender, model.balances);
-				var updatedBalance = A3($author$project$Concept$Mapping$insert, global.msg.sender, senderBalance - amount, model.balances);
-				var recipientBalance = A2($author$project$Concept$Mapping$get, address, updatedBalance);
+				var updatedBalances = A3($author$project$Concept$Mapping$insert, global.msg.sender, senderBalance - amount, model.balances);
+				var recipientBalance = A2($author$project$Concept$Mapping$get, address, updatedBalances);
 				return _Utils_Tuple3(
 					_List_fromArray(
 						[
@@ -20326,7 +20326,7 @@ var $author$project$ERC20$ERC20$update = F3(
 					_Utils_update(
 						model,
 						{
-							balances: A3($author$project$Concept$Mapping$insert, address, recipientBalance + amount, updatedBalance)
+							balances: A3($author$project$Concept$Mapping$insert, address, recipientBalance + amount, updatedBalances)
 						}),
 					$author$project$Concept$Contract$Single(
 						$author$project$Concept$Contract$RBool(true)));
@@ -20354,10 +20354,10 @@ var $author$project$ERC20$ERC20$update = F3(
 						[
 							_Utils_Tuple2(
 							!_Utils_eq(global.msg.sender, $author$project$Concept$Core$zeroAddress),
-							'ERC20: transfer from the zero address'),
+							'ERC20: approve from the zero address'),
 							_Utils_Tuple2(
 							!_Utils_eq(spender, $author$project$Concept$Core$zeroAddress),
-							'ERC20: transfer to the zero address')
+							'ERC20: approve to the zero address')
 						]),
 					_Utils_update(
 						model,
@@ -20428,20 +20428,20 @@ var $author$project$ERC20$ERC20$update = F3(
 						$author$project$Concept$Contract$RInt(model.totalSupply)));
 		}
 	});
-var $author$project$ERC20$ERC20$main = $author$project$Concept$Contract$initialize(
+var $author$project$ERC20$IERC20$main = $author$project$Concept$Contract$interpret(
 	A4(
-		$author$project$Concept$Contract$Contract,
+		$author$project$Concept$Contract$ContractCore,
 		_Utils_Tuple2(
 			$author$project$ERC20$ERC20$constructor,
 			$author$project$Concept$Contract$ITuple3(
 				_Utils_Tuple3($author$project$Concept$Contract$IString, $author$project$Concept$Contract$IString, $author$project$Concept$Contract$IInt))),
 		$author$project$ERC20$ERC20$update,
-		$author$project$ERC20$ERC20$signatures,
-		$author$project$ERC20$ERC20$encodeMsg));
-_Platform_export({'ERC20':{'ERC20':{'init':$author$project$ERC20$ERC20$main(
+		$author$project$ERC20$IERC20$signatures,
+		$author$project$ERC20$IERC20$encodeMsg));
+_Platform_export({'ERC20':{'IERC20':{'init':$author$project$ERC20$IERC20$main(
 	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Concept.Contract.Msg","aliases":{"Concept.Core.Address":{"args":[],"type":"String.String"},"Concept.Core.Block":{"args":[],"type":"{ coinbase : Concept.Core.Address, difficulty : Basics.Int, gasLimit : Basics.Int, number : Basics.Int, timestamp : Basics.Int }"},"Concept.Core.Global":{"args":[],"type":"{ msg : Concept.Core.Msg, block : Concept.Core.Block }"},"Concept.Core.Msg":{"args":[],"type":"{ sender : Concept.Core.PayableAddress, data : String.String, sig : String.String, value : Basics.Int }"},"Concept.Core.PayableAddress":{"args":[],"type":"String.String"}},"unions":{"Concept.Contract.Msg":{"args":[],"tags":{"GenerateGlobal":["Concept.Contract.Msg","Time.Posix"],"SetGlobal":["Concept.Contract.Msg","Concept.Core.Global"],"GenerateNewAddress":[],"GetAddressSeed":["Basics.Int"],"SetDeployer":["Concept.Core.Address"],"SetValue":["Basics.Int"],"DeployIntent":["Concept.Contract.Msg"],"Deploy":["Concept.Contract.FunctionIO"],"ContractCallIntent":["Concept.Contract.Msg"],"ContractCall":["String.String","Concept.Contract.FunctionIO"],"SetForm":["String.String","Concept.Contract.Position","Concept.Contract.Basic"]}},"Concept.Contract.Basic":{"args":[],"tags":{"RAddress":["Concept.Core.Address"],"RString":["String.String"],"RInt":["Basics.Int"],"RBool":["Basics.Bool"]}},"Concept.Contract.FunctionIO":{"args":[],"tags":{"None":[],"Single":["Concept.Contract.Basic"],"Tuple2":["( Concept.Contract.Basic, Concept.Contract.Basic )"],"Tuple3":["( Concept.Contract.Basic, Concept.Contract.Basic, Concept.Contract.Basic )"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Concept.Contract.Position":{"args":[],"tags":{"P1":[],"P2":[],"P3":[]}},"Time.Posix":{"args":[],"tags":{"Posix":["Basics.Int"]}},"String.String":{"args":[],"tags":{"String":[]}},"Basics.Bool":{"args":[],"tags":{"True":[],"False":[]}}}}})}}});}(this));
 
-  var app = Elm.ERC20.ERC20.init({ node: document.getElementById("elm") });
+  var app = Elm.ERC20.IERC20.init({ node: document.getElementById("elm") });
 }
 catch (e)
 {

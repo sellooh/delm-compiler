@@ -1,24 +1,16 @@
 module ERC20.ERC20 exposing (..)
 
-import Concept.Contract as ContractModule exposing (Basic(..), Contract, FunctionIO(..), Interface(..), InterfaceIO(..), Signature, initialize, subscriptions)
-import Concept.Core exposing (Address, Global, Requirements, defaultValues, throw, zeroAddress)
+import Concept.Contract as ContractModule exposing (Basic(..), Contract, FunctionIO(..), Interface(..), InterfaceIO(..), Signature, deploy, subscriptions)
+import Concept.Core exposing (Address, Global, Requirements, throw, zeroAddress)
 import Concept.DefaultValues as Default
 import Concept.Mapping as Mapping exposing (Mapping(..))
-import Dict exposing (Dict)
 
 
-main : Program () (ContractModule.Model Model) ContractModule.Msg
+main : Program () Model Msg
 main =
-    initialize
-        (Contract ( constructor, ITuple3 ( IString, IString, IInt ) )
+    deploy <|
+        Contract ( constructor, ITuple3 ( IString, IString, IInt ) )
             update
-            signatures
-            encodeMsg
-        )
-
-
-
--- Contract types
 
 
 type alias Model =
@@ -81,11 +73,11 @@ update msg global model =
                 senderBalance =
                     Mapping.get global.msg.sender model.balances
 
-                updatedBalance =
+                updatedBalances =
                     Mapping.insert global.msg.sender (senderBalance - amount) model.balances
 
                 recipientBalance =
-                    Mapping.get address updatedBalance
+                    Mapping.get address updatedBalances
             in
             ( [ ( global.msg.sender /= zeroAddress, "ERC20: transfer from the zero address" )
               , ( address /= zeroAddress, "ERC20: transfer to the zero address" )
@@ -95,7 +87,7 @@ update msg global model =
                 | balances =
                     Mapping.insert address
                         (recipientBalance + amount)
-                        updatedBalance
+                        updatedBalances
               }
             , Single <| RBool True
             )
@@ -120,8 +112,8 @@ update msg global model =
                         (Mapping.insert spender amount allowancesMapping)
                         model.allowances
             in
-            ( [ ( global.msg.sender /= zeroAddress, "ERC20: transfer from the zero address" )
-              , ( spender /= zeroAddress, "ERC20: transfer to the zero address" )
+            ( [ ( global.msg.sender /= zeroAddress, "ERC20: approve from the zero address" )
+              , ( spender /= zeroAddress, "ERC20: approve to the zero address" )
               ]
             , { model | allowances = allowances }
             , Single <|
@@ -177,51 +169,3 @@ update msg global model =
 
         GetTotalSupply ->
             ( [], model, Single <| RInt model.totalSupply )
-
-
-signatures : List ( String, Signature )
-signatures =
-    [ ( "balanceOf", Signature (ISingle IAddress) (ISingle IInt) )
-    , ( "transfer", Signature (ITuple2 ( IAddress, IInt )) (ISingle IBool) )
-    , ( "allowance", Signature (ITuple2 ( IAddress, IAddress )) (ISingle IBool) )
-    , ( "approve", Signature (ITuple2 ( IAddress, IInt )) (ISingle IBool) )
-    , ( "transferFrom", Signature (ITuple3 ( IAddress, IAddress, IInt )) (ISingle IBool) )
-    , ( "name", Signature INone (ISingle IString) )
-    , ( "symbol", Signature INone (ISingle IString) )
-    , ( "decimals", Signature INone (ISingle IInt) )
-    , ( "totalSupply", Signature INone (ISingle IInt) )
-    ]
-
-
-encodeMsg : ( String, FunctionIO ) -> Msg
-encodeMsg toEncode =
-    case toEncode of
-        ( "balanceOf", Single (RAddress address) ) ->
-            BalanceOf address
-
-        ( "transfer", Tuple2 ( RAddress address, RInt amount ) ) ->
-            Transfer address amount
-
-        ( "allowance", Tuple2 ( RAddress owner, RAddress spender ) ) ->
-            GetAllowance owner spender
-
-        ( "approve", Tuple2 ( RAddress owner, RInt amount ) ) ->
-            Approve owner amount
-
-        ( "transferFrom", Tuple3 ( RAddress sender, RAddress recipient, RInt amount ) ) ->
-            TransferFrom sender recipient amount
-
-        ( "name", None ) ->
-            GetName
-
-        ( "symbol", None ) ->
-            GetSymbol
-
-        ( "decimals", None ) ->
-            GetDecimals
-
-        ( "totalSupply", None ) ->
-            GetTotalSupply
-
-        _ ->
-            throw "Invalid Call"
