@@ -1,6 +1,6 @@
 module Voting.Voting exposing (..)
 
-import Concept.Contract as ContractModule exposing (Basic(..), Contract, FunctionIO(..), Interface(..), InterfaceIO(..), Signature, deploy, subscriptions)
+import Concept.Contract as ContractModule exposing (Basic(..), Contract, FunctionIO(..), Interface(..), InterfaceIO(..), Signature, deploy)
 import Concept.Core exposing (Address, Global, Requirements, throw, zeroAddress)
 import Concept.Mapping as Mapping exposing (Mapping(..))
 

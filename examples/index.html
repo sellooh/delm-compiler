@@ -11136,9 +11136,6 @@ var $author$project$Concept$Contract$init = F2(
 	});
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $author$project$Concept$Contract$subscriptions = function (model) {
-	return $elm$core$Platform$Sub$none;
-};
 var $author$project$Concept$Contract$GenerateGlobal = F2(
 	function (a, b) {
 		return {$: 'GenerateGlobal', a: a, b: b};
@@ -20201,7 +20198,9 @@ var $author$project$Concept$Contract$interpret = function (contract) {
 	return $elm$browser$Browser$element(
 		{
 			init: $author$project$Concept$Contract$init(contract),
-			subscriptions: $author$project$Concept$Contract$subscriptions,
+			subscriptions: function (_v0) {
+				return $elm$core$Platform$Sub$none;
+			},
 			update: $author$project$Concept$Contract$update(contract),
 			view: $author$project$Concept$Contract$view(contract)
 		});

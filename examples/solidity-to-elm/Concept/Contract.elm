@@ -1,8 +1,4 @@
-port module Concept.Contract exposing (..)
-
--- import Html exposing (Html, address, button, div, h1, h3, input, text)
--- import Html.Attributes exposing (checked, placeholder, type_, value)
--- import Html.Events exposing (onCheck, onClick, onInput)
+module Concept.Contract exposing (..)
 
 import Array exposing (Array)
 import Browser
@@ -115,7 +111,7 @@ interpret contract =
         { init = init contract
         , view = view contract
         , update = update contract
-        , subscriptions = subscriptions
+        , subscriptions = \_ -> Sub.none
         }
 
 
@@ -307,7 +303,6 @@ update contract msg model =
             ( { model | deploys = deploys, returns = newReturns }, Cmd.none )
 
         SetForm name position param ->
-            -- throw "not implemented yet."
             let
                 ( value1, value2, value3 ) =
                     Maybe.withDefault ( Nothing, Nothing, Nothing ) (Dict.get name model.form)
@@ -341,13 +336,6 @@ view contract model =
     layout [] <|
         row [ height fill, Element.width fill ]
             [ panel contract model
-
-            -- , div []
-            --     ([ h3 [] [ text "Constructor" ]
-            --      ]
-            --         ++ formParseSend model "constructor"
-            --     )
-            -- , div [] (List.map (form model) signatures)
             ]
 
 
@@ -402,8 +390,7 @@ viewAddresses model =
         (List.map
             (\( k, v ) ->
                 row [ Element.width fill ]
-                    [ -- if k /= sender then
-                      Input.button
+                    [ Input.button
                         [ if k /= sender then
                             Background.color (Element.rgb255 0 80 255)
 
@@ -691,14 +678,6 @@ formParseSend model key =
                 }
             , el [ paddingEach { top = 15, right = 0, left = 10, bottom = 0 } ] <| text returns
             ]
-
-
-subscriptions : Model model -> Sub Msg
-subscriptions model =
-    Sub.none
-
-
-port messageReceiver : (String -> msg) -> Sub msg
 
 
 anyInt : Random.Generator Int

@@ -1,6 +1,6 @@
 module ERC20.IERC20 exposing (..)
 
-import Concept.Contract as ContractModule exposing (Basic(..), ContractCore, FunctionIO(..), Interface(..), InterfaceIO(..), Signature, deploy, interpret, subscriptions)
+import Concept.Contract as ContractModule exposing (Basic(..), ContractCore, FunctionIO(..), Interface(..), InterfaceIO(..), Signature, deploy, interpret)
 import Concept.Core exposing (throw)
 import ERC20.ERC20 exposing (..)
 
