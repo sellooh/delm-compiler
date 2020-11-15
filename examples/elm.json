@@ -1,8 +1,7 @@
 {
     "type": "application",
     "source-directories": [
-        "elm-to-solidity",
-        "solidity-to-elm"
+        "src"
     ],
     "elm-version": "0.19.1",
     "dependencies": {
