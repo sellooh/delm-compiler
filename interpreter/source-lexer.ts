@@ -17,7 +17,7 @@ enum TokenType {
   rbracket = "RBRACKET",
   dQuote = "D_QUOTE",
   sQuote = "S_QUOTE",
-  tripleDQuotes = "TRIPLE_D_QUOTES", // TODO handle these
+  tripleDQuotes = "TRIPLE_D_QUOTES",
   contents = "CONTENTS",
 }
 

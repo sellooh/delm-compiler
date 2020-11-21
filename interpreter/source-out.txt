@@ -1,0 +1,2637 @@
+
+Source:
+-- This is a comment
+
+
+module ERC20.ERC20 exposing (..)
+
+-- This is a comment
+--hm This is a comment too
+{- Comment --
+   --
+      {- {- -}
+      import as exposing) All comments -} edge cases
+-}
+
+import Concept.Contract as ContractModule
+    exposing
+        ( Basic(..)
+        , Contract
+        , FunctionIO(..)
+        , Interface(..)
+        , InterfaceIO(..)
+        , Signature
+        , deploy
+        )
+import Concept.Core exposing (Address, Global, Requirements, throw, zeroAddress)
+import Concept.DefaultValues as Default
+import Concept.Mapping as Mapping exposing (Mapping(..))
+
+
+main : Program () Model Msg
+main =
+    deploy <|
+        Contract ( constructor, ITuple3 ( IString, IString, IInt ) )
+            update
+
+
+type alias Model =
+    { balances : Mapping Address Int
+    , allowances : Mapping Address (Mapping Address Int)
+    , totalSupply : Int
+    , name : String
+    , symbol : String
+    , decimals : Int
+    }
+
+
+constructor : Global -> FunctionIO -> Model
+constructor global params =
+    let
+        ( name, symbol, totalSupply ) =
+            case params of
+                Tuple3 ( RString n, RString s, RInt ts ) ->
+                    ( n, s, ts )
+
+                _ ->
+                    throw ("Found \"2\" Invalid" ++ "parameters")
+    in
+    { balances = Mapping.insert global.msg.sender totalSupply (Mapping.empty Default.int)
+    , allowances = Mapping.empty (Mapping.empty Default.int)
+    , totalSupply = totalSupply
+    , name = name
+    , symbol = symbol
+    , decimals = (2 ^ -1) * 2
+    }
+
+
+test =
+    \x -> -1.0
+
+
+test2 =
+    \x -> 0xAA
+
+
+t =
+    """ehyy
+    yoook
+    k
+ -- kek """
+
+
+type Msg
+    = BalanceOf Address
+    | Transfer Address Int
+    | GetAllowance Address Address
+    | Approve Address Int
+    | TransferFrom Address Address Int
+    | GetName
+    | GetSymbol
+    | GetDecimals
+    | GetTotalSupply
+
+
+update : Msg -> Global -> Model -> ( Requirements, Model, FunctionIO )
+update msg global model =
+    case msg of
+        BalanceOf address ->
+            let
+                balance =
+                    Mapping.get address model.balances
+            in
+            ( []
+            , model
+            , Single <| RInt balance
+            )
+
+        Transfer address amount ->
+            let
+                senderBalance =
+                    Mapping.get global.msg.sender model.balances
+
+                updatedBalances =
+                    Mapping.insert global.msg.sender (senderBalance - amount) model.balances
+
+                recipientBalance =
+                    Mapping.get address updatedBalances
+            in
+            ( [ ( global.msg.sender /= zeroAddress, "ERC20: transfer from the zero address" )
+              , ( address /= zeroAddress, "ERC20: transfer to the zero address" )
+              , ( senderBalance >= amount, "ERC20: transfer amount exceeds balance" )
+              ]
+            , { model
+                | balances =
+                    Mapping.insert address
+                        (recipientBalance + amount)
+                        updatedBalances
+              }
+            , Single <| RBool True
+            )
+
+        GetAllowance owner spender ->
+            let
+                allowancesMapping =
+                    Mapping.get owner model.allowances
+
+                allowedBalance =
+                    Mapping.get spender allowancesMapping
+            in
+            ( [], model, Single (RInt allowedBalance) )
+
+        Approve spender amount ->
+            let
+                allowancesMapping =
+                    Mapping.get global.msg.sender model.allowances
+
+                allowances =
+                    Mapping.insert global.msg.sender
+                        (Mapping.insert spender amount allowancesMapping)
+                        model.allowances
+            in
+            ( [ ( global.msg.sender /= zeroAddress, "ERC20: approve from the zero address" )
+              , ( spender /= zeroAddress, "ERC20: approve to the zero address" )
+              ]
+            , { model | allowances = allowances }
+            , Single <|
+                RBool True
+            )
+
+        TransferFrom sender recipient amount ->
+            let
+                senderBalance =
+                    Mapping.get sender model.balances
+
+                updatedBalance =
+                    Mapping.insert sender (senderBalance - amount) model.balances
+
+                recipientBalance =
+                    Mapping.get recipient updatedBalance
+
+                allowancesMapping =
+                    Mapping.get sender model.allowances
+
+                allowedBalance =
+                    Mapping.get global.msg.sender allowancesMapping
+
+                allowances =
+                    Mapping.insert sender
+                        (Mapping.insert global.msg.sender (allowedBalance - amount) allowancesMapping)
+                        model.allowances
+            in
+            ( [ ( sender /= zeroAddress, "ERC20: transfer from the zero address" )
+              , ( recipient /= zeroAddress, "ERC20: transfer to the zero address" )
+              , ( senderBalance >= amount, "ERC20: transfer amount exceeds balance" )
+              , ( allowedBalance >= amount, "ERC20: transfer amount exceeds allowance" )
+              ]
+            , { model
+                | allowances = allowances
+                , balances =
+                    Mapping.insert recipient
+                        (recipientBalance + amount)
+                        updatedBalance
+              }
+            , Single <|
+                RBool True
+            )
+
+        GetName ->
+            ( [], model, Single <| RString model.name )
+
+        GetSymbol ->
+            ( [], model, Single <| RString model.symbol )
+
+        GetDecimals ->
+            ( [], model, Single <| RInt model.decimals )
+
+        GetTotalSupply ->
+            ( [], model, Single <| RInt model.totalSupply )
+
+
+Tokens:
+[
+    {
+        "type": "KEYWORD",
+        "symbol": "module"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "ERC20.ERC20"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "exposing"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "(..)"
+    },
+    {
+        "type": "SCOPE_END",
+        "symbol": "\n\n"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "import"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Concept.Contract"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "as"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "ContractModule"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "exposing"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Basic"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "(..)"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Contract"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "FunctionIO"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "(..)"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Interface"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "(..)"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "InterfaceIO"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "(..)"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Signature"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "deploy"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "import"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Concept.Core"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "exposing"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Address"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Global"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Requirements"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "throw"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "zeroAddress"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "import"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Concept.DefaultValues"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "as"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Default"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "import"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Concept.Mapping"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "as"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "exposing"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "(..)"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "SCOPE_END",
+        "symbol": "\n\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "main"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "deploy"
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": "<|"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Contract"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "constructor"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "ITuple3"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "IString"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "IString"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "IInt"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "update"
+    },
+    {
+        "type": "SCOPE_END",
+        "symbol": "\n\n"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "type"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "alias"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Model"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "LBRACE",
+        "symbol": "{"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "balances"
+    },
+    {
+        "type": "REFERENCE",
+        "symbol": ":"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Address"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Int"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "allowances"
+    },
+    {
+        "type": "REFERENCE",
+        "symbol": ":"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Address"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Address"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Int"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "totalSupply"
+    },
+    {
+        "type": "REFERENCE",
+        "symbol": ":"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Int"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "name"
+    },
+    {
+        "type": "REFERENCE",
+        "symbol": ":"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "String"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "symbol"
+    },
+    {
+        "type": "REFERENCE",
+        "symbol": ":"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "String"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "decimals"
+    },
+    {
+        "type": "REFERENCE",
+        "symbol": ":"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Int"
+    },
+    {
+        "type": "RBRACE",
+        "symbol": "}"
+    },
+    {
+        "type": "SCOPE_END",
+        "symbol": "\n\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "constructor"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "global"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "params"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "let"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "name"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "symbol"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "totalSupply"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "case"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "params"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "of"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Tuple3"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "RString"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "n"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "RString"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "s"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "RInt"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "ts"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "->"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "n"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "s"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "ts"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "BLOCK_END",
+        "symbol": "\n"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "_"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "->"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "throw"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "D_QUOTE",
+        "symbol": "\""
+    },
+    {
+        "type": "CONTENTS",
+        "symbol": "Found \\\"2\\\" Invalid"
+    },
+    {
+        "type": "D_QUOTE",
+        "symbol": "\""
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": "++"
+    },
+    {
+        "type": "D_QUOTE",
+        "symbol": "\""
+    },
+    {
+        "type": "CONTENTS",
+        "symbol": "parameters"
+    },
+    {
+        "type": "D_QUOTE",
+        "symbol": "\""
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "in"
+    },
+    {
+        "type": "LBRACE",
+        "symbol": "{"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "balances"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping.insert"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "global.msg.sender"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "totalSupply"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping.empty"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Default.int"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "allowances"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping.empty"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping.empty"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Default.int"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "totalSupply"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "totalSupply"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "name"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "name"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "symbol"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "symbol"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "decimals"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "NUMBER_LITERAL",
+        "symbol": "2"
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": "^"
+    },
+    {
+        "type": "NUMBER_LITERAL",
+        "symbol": "-1"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": "*"
+    },
+    {
+        "type": "NUMBER_LITERAL",
+        "symbol": "2"
+    },
+    {
+        "type": "RBRACE",
+        "symbol": "}"
+    },
+    {
+        "type": "SCOPE_END",
+        "symbol": "\n\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "test"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "ANONYMOUS",
+        "symbol": "\\"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "x"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "->"
+    },
+    {
+        "type": "NUMBER_LITERAL",
+        "symbol": "-1.0"
+    },
+    {
+        "type": "SCOPE_END",
+        "symbol": "\n\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "test2"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "ANONYMOUS",
+        "symbol": "\\"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "x"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "->"
+    },
+    {
+        "type": "NUMBER_LITERAL",
+        "symbol": "0xAA"
+    },
+    {
+        "type": "SCOPE_END",
+        "symbol": "\n\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "t"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "TRIPLE_D_QUOTES",
+        "symbol": "\"\"\""
+    },
+    {
+        "type": "CONTENTS",
+        "symbol": "ehyy\n    yoook\n    k\n -- kek "
+    },
+    {
+        "type": "TRIPLE_D_QUOTES",
+        "symbol": "\"\"\""
+    },
+    {
+        "type": "SCOPE_END",
+        "symbol": "\n\n"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "type"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Msg"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "BalanceOf"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Address"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": "|"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Transfer"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Address"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Int"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": "|"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "GetAllowance"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Address"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Address"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": "|"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Approve"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Address"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Int"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": "|"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "TransferFrom"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Address"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Address"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Int"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": "|"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "GetName"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": "|"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "GetSymbol"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": "|"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "GetDecimals"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": "|"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "GetTotalSupply"
+    },
+    {
+        "type": "SCOPE_END",
+        "symbol": "\n\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "update"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "msg"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "global"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "case"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "msg"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "of"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "BalanceOf"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "address"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "->"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "let"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "balance"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping.get"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "address"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model.balances"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "in"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "LBRACKET",
+        "symbol": "["
+    },
+    {
+        "type": "RBRACKET",
+        "symbol": "]"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Single"
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": "<|"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "RInt"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "balance"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "BLOCK_END",
+        "symbol": "\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Transfer"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "address"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "amount"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "->"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "let"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "senderBalance"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping.get"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "global.msg.sender"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model.balances"
+    },
+    {
+        "type": "BLOCK_END",
+        "symbol": "\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "updatedBalances"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping.insert"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "global.msg.sender"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "senderBalance"
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": "-"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "amount"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model.balances"
+    },
+    {
+        "type": "BLOCK_END",
+        "symbol": "\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "recipientBalance"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping.get"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "address"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "updatedBalances"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "in"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "address"
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": "/="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "zeroAddress"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "D_QUOTE",
+        "symbol": "\""
+    },
+    {
+        "type": "CONTENTS",
+        "symbol": "ERC20: transfer to the zero address"
+    },
+    {
+        "type": "D_QUOTE",
+        "symbol": "\""
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "senderBalance"
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": ">="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "amount"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "D_QUOTE",
+        "symbol": "\""
+    },
+    {
+        "type": "CONTENTS",
+        "symbol": "ERC20: transfer amount exceeds balance"
+    },
+    {
+        "type": "D_QUOTE",
+        "symbol": "\""
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "RBRACKET",
+        "symbol": "]"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "LBRACE",
+        "symbol": "{"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": "|"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "balances"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping.insert"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "address"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "recipientBalance"
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": "+"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "amount"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "updatedBalances"
+    },
+    {
+        "type": "RBRACE",
+        "symbol": "}"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Single"
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": "<|"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "RBool"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "True"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "BLOCK_END",
+        "symbol": "\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "GetAllowance"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "owner"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "spender"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "->"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "let"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "allowancesMapping"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping.get"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "owner"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model.allowances"
+    },
+    {
+        "type": "BLOCK_END",
+        "symbol": "\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "allowedBalance"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping.get"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "spender"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "allowancesMapping"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "in"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "LBRACKET",
+        "symbol": "["
+    },
+    {
+        "type": "RBRACKET",
+        "symbol": "]"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Single"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "RInt"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "allowedBalance"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "BLOCK_END",
+        "symbol": "\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Approve"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "spender"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "amount"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "->"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "let"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "allowancesMapping"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping.get"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "global.msg.sender"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model.allowances"
+    },
+    {
+        "type": "BLOCK_END",
+        "symbol": "\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "allowances"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping.insert"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "global.msg.sender"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping.insert"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "spender"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "amount"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "allowancesMapping"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model.allowances"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "in"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "spender"
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": "/="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "zeroAddress"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "D_QUOTE",
+        "symbol": "\""
+    },
+    {
+        "type": "CONTENTS",
+        "symbol": "ERC20: approve to the zero address"
+    },
+    {
+        "type": "D_QUOTE",
+        "symbol": "\""
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "RBRACKET",
+        "symbol": "]"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "LBRACE",
+        "symbol": "{"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": "|"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "allowances"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "allowances"
+    },
+    {
+        "type": "RBRACE",
+        "symbol": "}"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Single"
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": "<|"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "RBool"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "True"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "BLOCK_END",
+        "symbol": "\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "TransferFrom"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "sender"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "recipient"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "amount"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "->"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "let"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "senderBalance"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping.get"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "sender"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model.balances"
+    },
+    {
+        "type": "BLOCK_END",
+        "symbol": "\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "updatedBalance"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping.insert"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "sender"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "senderBalance"
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": "-"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "amount"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model.balances"
+    },
+    {
+        "type": "BLOCK_END",
+        "symbol": "\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "recipientBalance"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping.get"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "recipient"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "updatedBalance"
+    },
+    {
+        "type": "BLOCK_END",
+        "symbol": "\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "allowancesMapping"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping.get"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "sender"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model.allowances"
+    },
+    {
+        "type": "BLOCK_END",
+        "symbol": "\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "allowedBalance"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping.get"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "global.msg.sender"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "allowancesMapping"
+    },
+    {
+        "type": "BLOCK_END",
+        "symbol": "\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "allowances"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping.insert"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "sender"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping.insert"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "global.msg.sender"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "allowedBalance"
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": "-"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "amount"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "allowancesMapping"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model.allowances"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "in"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "recipient"
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": "/="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "zeroAddress"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "D_QUOTE",
+        "symbol": "\""
+    },
+    {
+        "type": "CONTENTS",
+        "symbol": "ERC20: transfer to the zero address"
+    },
+    {
+        "type": "D_QUOTE",
+        "symbol": "\""
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "senderBalance"
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": ">="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "amount"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "D_QUOTE",
+        "symbol": "\""
+    },
+    {
+        "type": "CONTENTS",
+        "symbol": "ERC20: transfer amount exceeds balance"
+    },
+    {
+        "type": "D_QUOTE",
+        "symbol": "\""
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "allowedBalance"
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": ">="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "amount"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "D_QUOTE",
+        "symbol": "\""
+    },
+    {
+        "type": "CONTENTS",
+        "symbol": "ERC20: transfer amount exceeds allowance"
+    },
+    {
+        "type": "D_QUOTE",
+        "symbol": "\""
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "RBRACKET",
+        "symbol": "]"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "LBRACE",
+        "symbol": "{"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": "|"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "allowances"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "allowances"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "balances"
+    },
+    {
+        "type": "ASSING",
+        "symbol": "="
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Mapping.insert"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "recipient"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "recipientBalance"
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": "+"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "amount"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "updatedBalance"
+    },
+    {
+        "type": "RBRACE",
+        "symbol": "}"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Single"
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": "<|"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "RBool"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "True"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "BLOCK_END",
+        "symbol": "\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "GetName"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "->"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "LBRACKET",
+        "symbol": "["
+    },
+    {
+        "type": "RBRACKET",
+        "symbol": "]"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Single"
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": "<|"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "RString"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model.name"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "BLOCK_END",
+        "symbol": "\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "GetSymbol"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "->"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "LBRACKET",
+        "symbol": "["
+    },
+    {
+        "type": "RBRACKET",
+        "symbol": "]"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Single"
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": "<|"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "RString"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model.symbol"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "BLOCK_END",
+        "symbol": "\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "GetDecimals"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "->"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "LBRACKET",
+        "symbol": "["
+    },
+    {
+        "type": "RBRACKET",
+        "symbol": "]"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Single"
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": "<|"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "RInt"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model.decimals"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "BLOCK_END",
+        "symbol": "\n"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "GetTotalSupply"
+    },
+    {
+        "type": "KEYWORD",
+        "symbol": "->"
+    },
+    {
+        "type": "LPAREN",
+        "symbol": "("
+    },
+    {
+        "type": "LBRACKET",
+        "symbol": "["
+    },
+    {
+        "type": "RBRACKET",
+        "symbol": "]"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model"
+    },
+    {
+        "type": "SEPARATOR",
+        "symbol": ","
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "Single"
+    },
+    {
+        "type": "OPERATOR",
+        "symbol": "<|"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "RInt"
+    },
+    {
+        "type": "IDENTIFIER",
+        "symbol": "model.totalSupply"
+    },
+    {
+        "type": "RPAREN",
+        "symbol": ")"
+    },
+    {
+        "type": "BLOCK_END",
+        "symbol": "\n"
+    }
+]
