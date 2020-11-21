@@ -27,6 +27,7 @@ interface Token {
 }
 
 const keywords = [
+  "port",
   "module",
   "exposing",
   "import",
@@ -185,12 +186,12 @@ export function lexer(lines: string[]): Token[] {
     }
 
     lexedLine = metaContentLine || lexedLine;
-    lexedLine = lexedLine.replace(/\((.)/g, "( $1");
-    lexedLine = lexedLine.replace(/(.)\)/g, "$1 )");
+    lexedLine = lexedLine.replace(/\(([^.])/g, "( $1");
+    lexedLine = lexedLine.replace(/([^.])\)/g, "$1 )");
     lexedLine = lexedLine.replace(/\[(.)/g, "[ $1");
     lexedLine = lexedLine.replace(/(.)\]/g, "$1 ]");
     lexedLine = lexedLine.replace(/(.),/g, "$1 ,");
-    lexedLine = lexedLine.replace(/\)/g, " ) ");
+    lexedLine = lexedLine.replace(/\(\.\.\)/g, " (..) ");
     lexedLine = lexedLine.replace(/\\([a-zA-Z])/g, "\\ $1");
     lexedLine = lexedLine.replace(/"/g, ' " ');
     lexedLine = lexedLine.replace(/'/g, " ' ");
