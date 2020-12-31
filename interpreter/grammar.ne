@@ -138,9 +138,9 @@ LITERAL -> 	SUM
 
 			{% ([_, v, __]) => { return [{ type: 'ARRAY', value: v }] } %}
 
-		| "{" RECORD_DEFINITION "}"
+		| "{" RECORD_DEFINITION_UPDATE RECORD_DEFINITION "}"
 
-			{% ([_, values, __]) => { return [{ type: 'RECORD', values }] } %}
+			{% ([_1, update, values, _2]) => { return [{ type: 'RECORD', update, values }] } %}
 
 		| "[" "]"
 
@@ -167,17 +167,26 @@ TUPLE -> __ S_STATEMENT "," __ S_STATEMENT "," __ S_STATEMENT __
 
 			{% ([_, st1, comma1, __, st2, comma2, ___, st3]) => [st1, st2, st3] %}
 
-		|  __ S_STATEMENT "," __ S_STATEMENT __
+		| __ S_STATEMENT "," __ S_STATEMENT __
 
 			{% ([_, st1, __, comma1, st2]) => [st1, st2] %}
 
-RECORD_DEFINITION -> 	__ ID_UNWRAPPED __ "=" __ S_STATEMENT _ "," RECORD_DEFINITION
+RECORD_DEFINITION -> __ ID_UNWRAPPED __ "=" __ S_STATEMENT _ "," RECORD_DEFINITION
 			
 			{% ([_, key, __, eq, ___, value, _e1, comma, values]) => { return [{ key, value }, ...values]} %}
 
-		|  	__ ID_UNWRAPPED __ "=" __ S_STATEMENT __
+		| __ ID_UNWRAPPED __ "=" __ S_STATEMENT __
 			
 			{% ([_, key, __, eq, ___, value]) => { return [{ key, value }]} %}
+
+
+RECORD_DEFINITION_UPDATE -> __ ID_UNWRAPPED __ "|"
+
+			{% ([_1, id]) => id %}
+
+		| null
+
+			{% () => null %}
 
 
 SUM -> (SUM|IDENTIFIER) __ ("+" | "-") __ (PRODUCT|IDENTIFIER)
