@@ -1,3 +1,26 @@
+@preprocessor typescript
+
+@{%
+
+const keywords = [
+  "port",
+  "module",
+  "exposing",
+  "import",
+  "as",
+  "(..)",
+  "type",
+  "alias",
+  "case",
+  "of",
+  "_",
+  "->",
+  "let",
+  "in",
+];
+
+%}
+
 DECLARATION -> FUNCTION_DELCARATION __ "=" __ S_STATEMENT
 	
 			{% ([dcl, _, eq, __, stm]) => { return { type: "DECLARATION", left: dcl, right: stm } } %}
@@ -47,6 +70,10 @@ S_STATEMENT -> 	STATEMENT
 			
 				{% ([n]) => n %}
 
+			| IF_ELSE
+			
+				{% ([n]) => n %}
+
 
 RIGHT_STATEMENT -> STATEMENT
 
@@ -74,13 +101,17 @@ STATEMENT ->  CALL
 
 			{% ([c1, _, cmp, __, c2]) => { return { type: 'COMPARATOR', comparator: cmp, left: c1[0], right: c2[0] }} %}
 
+		| CALL __ "++" __ CALL
+
+			{% ([c1, _, cmp, __, c2]) => { return { type: 'APPEND', left: c1[0], right: c2[0] }} %}
+
 
 LET_IN -> "let" __ LET_IN_DECLARATIONS __ "in"
 
 			{% ([lt, _1, declarations, _2, _in]) => { return declarations } %}
 
 
-LET_IN_DECLARATIONS -> (ID_UNWRAPPED | "(" TUPLE ")" {% ([_1, v, _2]) => [v] %}) __ "=" __ S_STATEMENT " <END> ":? LET_IN_DECLARATIONS
+LET_IN_DECLARATIONS -> (ID_UNWRAPPED | "(" TUPLE ")" {% ([_1, v, _2]) => [v] %}) __ "=" __ S_STATEMENT (__ "\\n" __ | null) LET_IN_DECLARATIONS
 
 			{% ([[dcl], _1, eq, _2, stm, end, declarations]) => { return [{ left: dcl, right: stm }, ...declarations] } %}
 
@@ -89,14 +120,26 @@ LET_IN_DECLARATIONS -> (ID_UNWRAPPED | "(" TUPLE ")" {% ([_1, v, _2]) => [v] %})
 			{% () => [] %}
 
 
+IF_ELSE -> "if" __ STATEMENT __ "then" __ STATEMENT (__ ELSE_IF | null) __ "else" __ STATEMENT
+
+			{% ([_if, _1, condition, _2, then, _3, stm, [, branches], _4, _else, _5, elseStm]) => { return { type: "IF", condition, statement: stm, branches, elseStm } } %}
+
+
+ELSE_IF -> "else" __ "if" __ STATEMENT __ "then" __ STATEMENT (__ ELSE_IF | null)
+
+			{% ([_else, _1, _if, _2, condition, _3, then, _4, stm, [, branches]]) => { return [{ type: "ELSE IF", condition, statement: stm }] } %}
+
+		| null {% () => [] %}
+
+
 CASE_OF -> "case" __ ID_UNWRAPPED __ "of" CASE_OF_BRANCH
 
 			{% ([_case, _1, condition, _2, of, branches]) => { return { type: "CASE", condition, branches } } %}
 
 
-CASE_OF_BRANCH -> __ (CASE_OF_MATCH | "_") __ "->" __ S_STATEMENT _ "[END]":? _ CASE_OF_BRANCH
+CASE_OF_BRANCH -> __ (CASE_OF_MATCH | "_") __ "->" __ S_STATEMENT (__ "\\n" | null) CASE_OF_BRANCH
 
-			{% ([_1, [match], _2, arrow, _3, stm, _4, END, _5, branches]) => { return [{ type: "BRANCH", match, statement: stm }, ...branches] } %}
+			{% ([_1, [match], _2, arrow, _3, stm, END, branches]) => { return [{ type: "BRANCH", match, statement: stm }, ...branches] } %}
 
 		| null
 
@@ -129,6 +172,10 @@ CALL -> LITERAL
 LITERAL -> 	SUM
 			
 			{% n => n %}
+		
+		| "\"" _ "$STRING_LITERAL$" _ [0-9]:+ _ "\""
+
+			{% ([_, , v, , [i], , __]) => { return [{ type: 'STRING', value: v, position: i }] } %}
 
 		| "(" TUPLE ")"
 
@@ -163,11 +210,11 @@ ARRAY -> __ S_STATEMENT "," ARRAY
 
 			{% ([_, v, __]) => [v] %}
 
-TUPLE -> __ S_STATEMENT "," __ S_STATEMENT "," __ S_STATEMENT __
+TUPLE -> __ S_STATEMENT _ "," __ S_STATEMENT _ "," __ S_STATEMENT __
 
-			{% ([_, st1, comma1, __, st2, comma2, ___, st3]) => [st1, st2, st3] %}
+			{% ([_, st1, , comma1, __, st2, , comma2, ___, st3]) => [st1, st2, st3] %}
 
-		| __ S_STATEMENT "," __ S_STATEMENT __
+		| __ S_STATEMENT _ "," __ S_STATEMENT __
 
 			{% ([_, st1, __, comma1, st2]) => [st1, st2] %}
 
@@ -259,11 +306,11 @@ EXP -> (NUMBER|IDENTIFIER) _ "^" _ (EXP | IDENTIFIER)
 
 NUMBER -> 	"-":? [0-9]:+
 
-			{% ([signal, n]) => { return { type: 'LITERAL', value: signal === null ? n.join("") : signal + n }} %}
+			{% ([signal, n]) => { return { type: 'LITERAL', value: signal === null ? n.join("") : signal + n.join("") }} %}
 
 		| "-":? [0-9]:+ "." [0-9]:+
 
-			{% ([signal, n1, dot, n2]) => { return { type: 'LITERAL', value: signal === null ? n1 + dot + n2 : signal + n1 + dot + n2 }} %}
+			{% ([signal, n1, dot, n2]) => { return { type: 'LITERAL', value: signal === null ? n1.join("") + dot + n2.join("") : signal + n1.join("") + dot + n2.join("") }} %}
 		 # TODO add HEX
 
 
@@ -295,7 +342,7 @@ ID_UNWRAPPED -> ID
 
 ID -> [a-zA-Z]:+
 
-				{% n => n %}
+				{% (n, _, reject) => { if ( keywords.includes(n[0].join("")) ) { return reject } else { return n } } %}
 
 			| [a-zA-Z]:+ [0-9]:+ (ID {% ([n]) => n %} | null)
 
