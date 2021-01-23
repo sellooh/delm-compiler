@@ -40,7 +40,7 @@ PARAMS -> PARAMS __ ID_UNWRAPPED
 			{% () => [] %}
 
 
-EXPRESSIONS -> EXPRESSIONS __ (IDENTIFIER {% ([id]) => id %} | LITERAL {% ([id]) => id[0] %})
+EXPRESSIONS -> EXPRESSIONS __ (IDENTIFIER {% ([id]) => id %} | S_STATEMENT {% ([id]) => id[0] %})
 
 				{% ([es, _, v]) => [v, ...es] %}
 

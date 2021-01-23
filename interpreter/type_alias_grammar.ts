@@ -60,7 +60,7 @@ const grammar: Grammar = {
     {"name": "PARAMS", "symbols": ["PARAMS", "__", "ID_UNWRAPPED"], "postprocess": ([params, _1, id]) => { return [ id, ...params ] }},
     {"name": "PARAMS", "symbols": [], "postprocess": () => []},
     {"name": "EXPRESSIONS$subexpression$1", "symbols": ["IDENTIFIER"], "postprocess": ([id]) => id},
-    {"name": "EXPRESSIONS$subexpression$1", "symbols": ["LITERAL"], "postprocess": ([id]) => id[0]},
+    {"name": "EXPRESSIONS$subexpression$1", "symbols": ["S_STATEMENT"], "postprocess": ([id]) => id[0]},
     {"name": "EXPRESSIONS", "symbols": ["EXPRESSIONS", "__", "EXPRESSIONS$subexpression$1"], "postprocess": ([es, _, v]) => [v, ...es]},
     {"name": "EXPRESSIONS", "symbols": []},
     {"name": "S_STATEMENT", "symbols": ["STATEMENT"], "postprocess": ([n]) => n},

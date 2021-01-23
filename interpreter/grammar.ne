@@ -189,11 +189,11 @@ LITERAL -> 	SUM
 
 			{% ([_1, update, values, _2]) => { return [{ type: 'RECORD', update, values }] } %}
 
-		| "[" "]"
+		| "[" _ "]"
 
 			{% () => { return [{ type: 'ARRAY', value: null }] } %}
 
-		| "(" ")"
+		| "(" _ ")"
 
 			{% () => { return [{ type: 'TUPLE', value: null }] } %}
 
@@ -202,7 +202,7 @@ LITERAL -> 	SUM
 			{% ([p1, _1, v, _2, p2]) => { return [v] } %}
 
 
-ARRAY -> __ S_STATEMENT "," ARRAY
+ARRAY -> __ S_STATEMENT _ "," ARRAY
 
 			{% ([_, v, comma, c]) => [v, ...c] %}
 

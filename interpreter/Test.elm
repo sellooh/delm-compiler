@@ -20,4 +20,3 @@ constructor global params =
     , symbol = symbol
     , decimals = (2.5 ^ -1) * 2
     }
-
