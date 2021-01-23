@@ -1,4 +1,5 @@
 enum TokenType {
+  whitespace = "WHITESPACE",
   keyword = "KEYWORD",
   assign = "ASSING",
   reference = "REFERENCE",
@@ -21,7 +22,7 @@ enum TokenType {
   contents = "CONTENTS",
 }
 
-interface Token {
+export interface Token {
   type: TokenType;
   symbol: string;
 }
@@ -43,16 +44,41 @@ const keywords = [
   "in",
 ];
 
+const operators = [
+  ">",
+  "<",
+  ">=",
+  "<=",
+  "&&",
+  "||",
+  "<|",
+  "|>",
+  ">>",
+  "<<",
+  "++",
+  "==",
+  "/=",
+  "+",
+  "-",
+  "*",
+  "/",
+  "//",
+  "^",
+];
+
 const ignore = [
   " ",
   "",
 ];
 
-export function lexer(lines: string[]): Token[] {
+export function lexer(lines: string[]): [string[], Token[]] {
+  const stringTable: string[] = [];
+
   const tokens: Token[] = [];
   let inMultilineComment = 0,
     inMultilineString = false,
-    multilineStringContent = "";
+    multilineStringContent = "",
+    alias = false;
 
   for (const line of lines) {
     let lexedLine = line.trim();
@@ -80,13 +106,18 @@ export function lexer(lines: string[]): Token[] {
         multilineStringContent += line.slice(0, commentEnd);
         tokens.push({
           type: TokenType.contents,
-          symbol: multilineStringContent,
+          symbol: `$STRING_LITERAL$ ${stringTable.length}`,
         });
+        stringTable.push(multilineStringContent);
         inMultilineString = false;
         multilineStringContent = "";
         tokens.push({
           type: TokenType.tripleDQuotes,
-          symbol: '"""',
+          symbol: '"',
+        });
+        tokens.push({
+          type: TokenType.whitespace,
+          symbol: " ",
         });
         const lineContinuation = line.slice(commentEnd + 3);
         if (lineContinuation) {
@@ -104,7 +135,7 @@ export function lexer(lines: string[]): Token[] {
       inMultilineString = true;
       tokens.push({
         type: TokenType.tripleDQuotes,
-        symbol: '"""',
+        symbol: '"', // TODO triple quotes
       });
       const content = lexedLine.slice(3);
       if (content) multilineStringContent += `${lexedLine.slice(3)}\n`;
@@ -114,30 +145,39 @@ export function lexer(lines: string[]): Token[] {
     if (lexedLine.slice(0, 2) == "--") continue;
 
     if (
+      !alias &&
       lexedLine.includes(":") &&
-      (!lexedLine.match(/^,/g) && !lexedLine.match(/^{/g))
+      (!lexedLine.match(/\"/g))
     ) {
       continue;
     }
 
     if (line == "" && tokens.length) {
-      if (tokens[tokens.length - 1].type === TokenType.blockEnd) {
-        tokens[tokens.length - 1] = ({
+      if (tokens[tokens.length - 2].type === TokenType.blockEnd) {
+        tokens[tokens.length - 3] = ({
           type: TokenType.scopeEnd,
-          symbol: "\n\n",
+          symbol: "\\n\\n",
         });
+        alias = false;
+        tokens.pop();
+        tokens.pop(); // to remove last whitespace
       } else {
         tokens.push({
           type: TokenType.blockEnd,
-          symbol: "\n",
+          symbol: "\\n",
+        });
+        tokens.push({
+          type: TokenType.whitespace,
+          symbol: " ",
         });
       }
       continue;
     }
 
-    let contents: string[] = [""],
-      replaceLineIndexes = [[0, 0]],
-      iContent = 0,
+    const contents: string[] = [""],
+      replaceLineIndexes = [[0, 0]];
+
+    let iContent = 0,
       insideContent = "",
       skipNext = false;
     if (lexedLine.includes('"') || lexedLine.includes("'")) {
@@ -200,8 +240,14 @@ export function lexer(lines: string[]): Token[] {
 
     for (const word of words) {
       if (keywords.includes(word)) {
+        if (word === "alias") alias = true;
         tokens.push({
           type: TokenType.keyword,
+          symbol: word,
+        });
+      } else if (operators.includes(word)) {
+        tokens.push({
+          type: TokenType.operator,
           symbol: word,
         });
       } else {
@@ -279,41 +325,20 @@ export function lexer(lines: string[]): Token[] {
               symbol: "'",
             });
             break;
-          case "$CONTENT$":
+          case "$CONTENT$": {
+            const i = currentContent++;
             tokens.push({
               type: TokenType.contents,
-              symbol: contents[currentContent++],
+              symbol: `$STRING_LITERAL$ ${stringTable.length}`,
             });
+            stringTable.push(contents[i]);
             break;
-          case ">":
-          case "<":
-          case ">=":
-          case "<=":
-          case "&&":
-          case "||":
-          case "<|":
-          case "|>":
-          case ">>":
-          case "<<":
-          case "++":
-          case "==":
-          case "/=":
-          case "+":
-          case "-":
-          case "*":
-          case "/":
-          case "//":
-          case "^":
-            tokens.push({
-              type: TokenType.operator,
-              symbol: word,
-            });
-            break;
-
+          }
           default:
             if (!ignore.includes(word)) {
               if (
                 word.match(/^[-]?[\d+]/g) ||
+                word.match(/^[-]?[\d+]\.[\d+]/g) ||
                 word.match(/^[-]?0x[0-9|A|a|B|b|C|c|D|d|E|e|F|f]+/g)
               ) {
                 tokens.push({
@@ -326,12 +351,47 @@ export function lexer(lines: string[]): Token[] {
                   symbol: word,
                 });
               }
+              break;
             }
-            break;
         }
+      }
+
+      const lastToken = tokens.length > 1
+        ? tokens[tokens.length - 1].type
+        : TokenType.keyword;
+      const tokenBeforeLastToken = tokens.length > 2
+        ? tokens[tokens.length - 2].type
+        : TokenType.keyword;
+
+      if (
+        tokens.length &&
+        lastToken != TokenType.whitespace
+        // && lastToken != TokenType.contents
+        // && (lastToken != TokenType.dQuote || (lastToken == TokenType.dQuote && tokenBeforeLastToken == TokenType.contents))
+      ) {
+        tokens.push({
+          type: TokenType.whitespace,
+          symbol: " ",
+        });
       }
     }
   }
 
-  return tokens;
+  let lastToken = tokens[tokens.length - 1];
+  while (
+    [
+      TokenType.whitespace,
+      TokenType.blockEnd,
+    ].includes(lastToken.type)
+  ) {
+    tokens.pop();
+    lastToken = tokens[tokens.length - 1];
+  }
+
+  tokens.push({
+    type: TokenType.scopeEnd,
+    symbol: "\\n\\n",
+  });
+
+  return [stringTable, tokens];
 }

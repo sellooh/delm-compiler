@@ -136,8 +136,8 @@ interface AstNode {
     | LiteralNode;
 }
 
-export function parser(tokens: Token[]): any[] {
-  let tree = [];
+export function parser(tokens: Token[]): Token[][] {
+  const tree = [];
   let segmentStart = 0;
 
   for (let i = 0; i < tokens.length; i++) {

@@ -175,7 +175,7 @@ LITERAL -> 	SUM
 		
 		| "\"" _ "$STRING_LITERAL$" _ [0-9]:+ _ "\""
 
-			{% ([_, , v, , [i], , __]) => { return [{ type: 'STRING', value: v, position: i }] } %}
+			{% ([_, , v, , i, , __]) => { return [{ type: 'STRING', value: v, position: i.join("") }] } %}
 
 		| "(" TUPLE ")"
 
@@ -216,7 +216,7 @@ TUPLE -> __ S_STATEMENT _ "," __ S_STATEMENT _ "," __ S_STATEMENT __
 
 		| __ S_STATEMENT _ "," __ S_STATEMENT __
 
-			{% ([_, st1, __, comma1, st2]) => [st1, st2] %}
+			{% ([_, st1, __, comma1, , st2]) => [st1, st2] %}
 
 RECORD_DEFINITION -> __ ID_UNWRAPPED __ "=" __ S_STATEMENT _ "," RECORD_DEFINITION
 			
