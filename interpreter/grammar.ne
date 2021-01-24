@@ -42,7 +42,7 @@ PARAMS -> PARAMS __ ID_UNWRAPPED
 
 EXPRESSIONS -> EXPRESSIONS __ (IDENTIFIER {% ([id]) => id %} | LITERAL {% ([id]) => id[0] %})
 
-				{% ([es, _, v]) => [v, ...es] %}
+				{% ([es, _, v]) => [...es, v] %}
 
 			| null
 
@@ -166,7 +166,7 @@ CALL -> LITERAL
 
 	| IDENTIFIER EXPRESSIONS
 
-			{% ([id, params]) => { return params.length > 0 ? [{ type: "FUNCTION_CALL", fun: id, param: params.reverse() }] : [id] } %}
+			{% ([id, params]) => { return params.length > 0 ? [{ type: "FUNCTION_CALL", fun: id, param: params }] : [id] } %}
 
 
 LITERAL -> 	SUM
