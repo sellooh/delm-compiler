@@ -36,11 +36,11 @@ WIP
 
 This isn't a set in stone roadmap, but as of right now a path the project could take:
 
-* Phase 0 (current): Develop the Delm Interpreter. This will allow developers to experience the creation of Smart Contracts in Delm. The Interpreter will feature a web playground similar to Remix where developers can test how a Delm Smart Contract behaves.
+* Phase 0 **(current)**: Develop the Delm Interpreter. This will allow developers to experience the creation of Smart Contracts in Delm. The Interpreter will feature a web playground similar to Remix where developers can test how a Delm Smart Contract behaves.
 
 * Phase 1: Develop the Delm Compiler. This will enable developers to generate .sol files from their .elm source code. They should be deployable-ready to any Ethereum or Ethereum-like network. Preferably they are easily readable by humans.
 
-* Beyond: Security. Ecosystem. Community. Bytecode generation. Having Phase 1 completed the project can take many directions. As of today the goal seems to be: Provide a good experience to developers looking to write reliable, secure and predictable Smart Contracts to Ethereum-compatible networks.
+* Beyond: Security. Ecosystem. Community. Bytecode generation. Having Phase 1 completed the project can take many directions. As of today **the goal is**: Provide a good experience to developers looking to write reliable, secure and predictable Smart Contracts to Ethereum-compatible networks.
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
