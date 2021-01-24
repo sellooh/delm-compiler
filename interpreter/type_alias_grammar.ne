@@ -40,7 +40,7 @@ PARAMS -> PARAMS __ ID_UNWRAPPED
 			{% () => [] %}
 
 
-EXPRESSIONS -> EXPRESSIONS __ (IDENTIFIER {% ([id]) => id %} | S_STATEMENT {% ([id]) => id[0] %})
+EXPRESSIONS -> EXPRESSIONS __ (IDENTIFIER {% ([id]) => id %} | LITERAL {% ([id]) => id[0] %})
 
 				{% ([es, _, v]) => [v, ...es] %}
 
@@ -60,10 +60,6 @@ STATEMENT -> LITERAL
 
 			{% ([_1, values, _2]) => { return [{ type: 'RECORD', values }] } %}
 
-		| "(" _ S_STATEMENT _ ")"
-
-			{% ([p1, _1, v, _2, p2]) => { return [v] } %}
-
 		| IDENTIFIER EXPRESSIONS
 		
 			{% ([id, params]) => { return params.length > 0 ? [{ type: "FUNCTION_CALL", fun: id, param: params.reverse() }] : [id] } %}
@@ -76,6 +72,10 @@ LITERAL -> "(" TUPLE ")"
 		| "(" ")"
 
 			{% () => { return [{ type: 'TUPLE', value: null }] } %}
+
+		| "(" _ S_STATEMENT _ ")"
+
+			{% ([p1, _1, v, _2, p2]) => { return [v] } %}
 
 
 

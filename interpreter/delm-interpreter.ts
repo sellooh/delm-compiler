@@ -3,6 +3,8 @@
 import { lexer, Token } from "./source-lexer.ts";
 import { parser as semiParser } from "./source-parser.ts";
 
+import { assertEquals } from "https://deno.land/std@0.84.0/testing/asserts.ts";
+
 import {
   Grammar,
   Parser,
@@ -29,16 +31,22 @@ const semiTree = semiParser(tokens);
 
 console.log("string table: ", "|" + stringTable.join("|") + "|");
 
-function runParser(parser: Parser, tokens: string) {
-  console.log("====>", tokens);
+let out = "";
+function runParser(parser: Parser, tokens: string): string {
+  // console.log("====>", tokens);
 
   const { results } = parser.feed(tokens);
 
-  const out = JSON.stringify(results[0], null, 4);
+  out += '\n';
+  out += JSON.stringify(results[0], null, 4);
 
-  console.log(results.length, out);
+  assertEquals(results.length, 1);
+  const [ tree ] = results;
+
+  return tree;
 }
 
+const treeList = [];
 for (let i = 0; i < semiTree.length; i++) {
   const nodes = semiTree[i];
 
@@ -52,7 +60,7 @@ for (let i = 0; i < semiTree.length; i++) {
 
       const t = tokenz.join("");
 
-      runParser(parser, t);
+      treeList.push(runParser(parser, t));
     } else {
       console.log("type");
 
@@ -60,13 +68,18 @@ for (let i = 0; i < semiTree.length; i++) {
 
       const t = tokenz.join("");
 
-      runParser(parser, t);
+      treeList.push(runParser(parser, t));
     }
   } else {
+    console.log("source");
+
     const parser = new Parser(srcGrammar);
 
     const t = tokenz.join("");
 
-    runParser(parser, t);
+    treeList.push(runParser(parser, t));
   }
 }
+
+// console.log(treeList)
+Deno.writeTextFile("out.txt", out);

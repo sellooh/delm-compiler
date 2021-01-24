@@ -54,8 +54,8 @@ const grammar: Grammar = {
   Lexer: undefined,
   ParserRules: [
     {"name": "DECLARATION", "symbols": ["FUNCTION_DELCARATION", "__", {"literal":"="}, "__", "S_STATEMENT"], "postprocess": ([dcl, _, eq, __, stm]) => { return { type: "DECLARATION", left: dcl, right: stm } }},
-    {"name": "FUNCTION_DELCARATION", "symbols": ["ID_UNWRAPPED", "PARAMS"], "postprocess": ([fun, params]) => { return { fun, params: params.reverse() } }},
-    {"name": "PARAMS", "symbols": ["PARAMS", "__", "ID_UNWRAPPED"], "postprocess": ([params, _1, id]) => { return [ id, ...params ] }},
+    {"name": "FUNCTION_DELCARATION", "symbols": ["ID_UNWRAPPED", "PARAMS"], "postprocess": ([fun, params]) => { return { fun, params: params } }},
+    {"name": "PARAMS", "symbols": ["PARAMS", "__", "ID_UNWRAPPED"], "postprocess": ([params, _1, id]) => { return [ ...params, id ] }},
     {"name": "PARAMS", "symbols": [], "postprocess": () => []},
     {"name": "EXPRESSIONS$subexpression$1", "symbols": ["IDENTIFIER"], "postprocess": ([id]) => id},
     {"name": "EXPRESSIONS$subexpression$1", "symbols": ["LITERAL"], "postprocess": ([id]) => id[0]},

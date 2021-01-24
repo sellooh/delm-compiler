@@ -28,12 +28,12 @@ DECLARATION -> FUNCTION_DELCARATION __ "=" __ S_STATEMENT
 
 FUNCTION_DELCARATION -> ID_UNWRAPPED PARAMS
 
-			{% ([fun, params]) => { return { fun, params: params.reverse() } } %}
+			{% ([fun, params]) => { return { fun, params: params } } %}
 
 
 PARAMS -> PARAMS __ ID_UNWRAPPED
 
-			{% ([params, _1, id]) => { return [ id, ...params ] } %}
+			{% ([params, _1, id]) => { return [ ...params, id ] } %}
 
 		| null
 
