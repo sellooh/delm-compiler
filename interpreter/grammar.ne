@@ -204,7 +204,7 @@ LITERAL -> 	SUM
 
 ARRAY -> __ S_STATEMENT _ "," ARRAY
 
-			{% ([_, v, comma, c]) => [v, ...c] %}
+			{% ([_, v, , comma, c]) => [v, ...c] %}
 
 		| __ S_STATEMENT __
 
